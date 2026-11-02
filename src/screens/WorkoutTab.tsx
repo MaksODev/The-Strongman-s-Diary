@@ -192,8 +192,7 @@ function DayCard({ day, done, onStart, onEdit }: {
       {!done && (
         <button
           onClick={onStart}
-          className="btn-brutal shrink-0 px-5 py-2.5 rounded-[14px] font-extrabold text-[14px] text-white"
-          style={{ background: 'linear-gradient(140deg, #a855f7 0%, #6d3df0 100%)', boxShadow: '0 6px 18px rgba(139,92,246,0.35)' }}
+          className="btn-brutal btn-flash shrink-0 px-5 py-2.5 rounded-[14px] font-extrabold text-[14px]"
         >
           Начать
         </button>

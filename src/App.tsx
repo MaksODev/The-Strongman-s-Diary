@@ -134,7 +134,7 @@ export default function App() {
       </div>
 
       {/* Баннер незавершённой тренировки + парящий таб-бар */}
-      <div className="px-3 pb-3 safe-bottom" style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 12px)' }}>
+      <div className="px-3" style={{ paddingBottom: 'max(calc(env(safe-area-inset-bottom) - 16px), 8px)' }}>
         {app.draft && screen.name === 'tabs' && (
           <button
             onClick={() => setScreen({ name: 'workout' })}
