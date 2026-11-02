@@ -4,6 +4,7 @@ import type { Equipment, PeriodizationScheme, Profile, Sex, TrainingExperience, 
 import { useApp } from '../state/store'
 import { SEX_TITLES, EXPERIENCE_TITLES, GOAL_TITLES, EQUIPMENT_TITLES, SCHEME_TITLES, WEEK_TYPE_TITLES } from '../types'
 import { PrimaryButton, SecondaryButton, Card } from '../components/ui'
+import { RulerScale } from '../components/RulerScale'
 
 const TOTAL_STEPS = 9
 
@@ -61,9 +62,18 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
     {
       title: 'Рост и вес',
       render: () => (
-        <div className="space-y-6">
-          <NumberStep value={profile.heightCm} min={130} max={230} unit="см" onChange={(v) => patch({ heightCm: v })} />
-          <NumberStep value={profile.weightKg} min={35} max={250} unit="кг" step={0.5} onChange={(v) => patch({ weightKg: v })} />
+        <div className="space-y-8">
+          <div>
+            <div className="text-text-secondary text-[13px] font-bold mb-2">Рост</div>
+            <RulerScale large className="h-20" value={profile.heightCm} min={130} max={230} step={1} span={30} majorEvery={10} unit="см"
+              onChange={(v) => patch({ heightCm: v })} />
+          </div>
+          <div>
+            <div className="text-text-secondary text-[13px] font-bold mb-2">Вес</div>
+            <RulerScale large className="h-20" value={profile.weightKg} min={35} max={250} step={0.5} span={20} majorEvery={5} unit="кг"
+              onChange={(v) => patch({ weightKg: v })} />
+          </div>
+          <p className="text-text-disabled text-[12px] text-center">Тяни линейку пальцем или нажми на число, чтобы ввести точное значение</p>
         </div>
       ),
     },

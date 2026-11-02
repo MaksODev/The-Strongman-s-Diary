@@ -115,6 +115,14 @@ function prescription(exercise: Exercise, goals: TrainingGoal[]): { sets: number
   if (goals.includes('endurance')) {
     return { sets: 3, repsMin: Math.max(12, exercise.repsMin), repsMax: Math.max(15, exercise.repsMax), rest: 45 }
   }
+  // Похудение: больше повторов и короче отдых (если не нужна масса)
+  if (goals.includes('fatLoss') && !goals.includes('mass')) {
+    return { sets: 3, repsMin: Math.max(10, exercise.repsMin), repsMax: Math.max(15, exercise.repsMax), rest: 60 }
+  }
+  // Рекомпозиция: гипертрофийный диапазон с умеренным отдыхом
+  if (goals.includes('recomposition') && !goals.includes('mass')) {
+    return { sets: 3, repsMin: exercise.repsMin, repsMax: exercise.repsMax, rest: 75 }
+  }
   return { sets: 3, repsMin: exercise.repsMin, repsMax: exercise.repsMax, rest: 90 }
 }
 

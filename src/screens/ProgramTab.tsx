@@ -2,12 +2,13 @@
 import { useState } from 'react'
 import { useApp } from '../state/store'
 import { adjustedWeight, currentWeek, cycle } from '../lib/periodization'
-import { exerciseById, exerciseImage, CATALOG } from '../lib/catalog'
+import { exerciseById, exerciseImage } from '../lib/catalog'
 import type { DayExercise, WorkoutDay } from '../types'
 import { SCHEME_TITLES, WEEK_TYPE_COLORS, WEEK_TYPE_TITLES, formatWeight } from '../types'
 import { Card, PrimaryButton, SecondaryButton, SectionTitle, Modal } from '../components/ui'
 import { InfoIcon } from '../components/icons'
 import { ExerciseInfoSheet } from '../components/ExerciseInfoSheet'
+import { CatalogSheet } from '../components/CatalogSheet'
 
 export function ProgramTab({ onEditDay }: { onEditDay: (dayOrderIndex: number) => void }) {
   const { plan, updatePlan } = useApp()
@@ -104,7 +105,6 @@ export function DayEdit({ dayOrderIndex, onBack }: { dayOrderIndex: number; onBa
   const { plan, updatePlan } = useApp()
   const [pickerFor, setPickerFor] = useState<number | null>(null) // индекс упражнения для замены
   const [addOpen, setAddOpen] = useState(false)
-  const [query, setQuery] = useState('')
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [infoId, setInfoId] = useState<string | null>(null)
   if (!plan) return null
@@ -153,7 +153,6 @@ export function DayEdit({ dayOrderIndex, onBack }: { dayOrderIndex: number; onBa
       }],
     })
     setAddOpen(false)
-    setQuery('')
   }
 
   const removeExercise = (id: string) => {
@@ -256,35 +255,15 @@ export function DayEdit({ dayOrderIndex, onBack }: { dayOrderIndex: number; onBa
         </Modal>
       )}
 
-      {/* Пикер: добавление или замена */}
+      {/* Пикер: добавление или замена (каталог с поиском и фильтрами по мышцам) */}
       {(addOpen || pickerFor !== null) && (
-        <div className="fixed inset-x-0 top-0 bg-bg z-40 flex flex-col safe-top safe-bottom" style={{ height: 'var(--app-h, 100%)' }}>
-          <div className="px-4 py-3 flex items-center gap-3 border-b border-elevated">
-            <input autoFocus value={query} onChange={(e) => setQuery(e.target.value)}
-              placeholder="Поиск упражнения…"
-              className="flex-1 bg-elevated rounded-[12px] px-4 py-2.5 text-text-primary outline-none" />
-            <button onClick={() => { setAddOpen(false); setPickerFor(null); setQuery('') }}
-              className="text-text-secondary font-medium">Отмена</button>
-          </div>
-          <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2">
-            {exercisePickerList(query, day.exercises.map((e) => e.exerciseID))
-              .filter((e) => pickerFor === null || e.id !== day.exercises[pickerFor]?.exerciseID)
-              .slice(0, 80)
-              .map((e) => (
-                <button key={e.id}
-                  onClick={() => (pickerFor !== null ? replaceExercise(day.exercises[pickerFor].exerciseID, e.id) : addExercise(e.id))}
-                  className="w-full flex items-center gap-3 p-2.5 rounded-[12px] bg-card border border-elevated text-left active:border-accent">
-                  <img src={exerciseImage(e.id)!} alt="" loading="lazy" className="w-11 h-11 rounded-[8px] object-cover bg-elevated" />
-                  <div className="min-w-0">
-                    <div className="font-medium text-[14px] truncate">{e.name}</div>
-                    <div className="text-text-secondary text-[11px]">
-                      {e.primaryMuscles.join(', ')}
-                    </div>
-                  </div>
-                </button>
-              ))}
-          </div>
-        </div>
+        <CatalogSheet
+          title={pickerFor !== null ? 'Заменить упражнение' : 'Добавить упражнение'}
+          exclude={day.exercises.map((e) => e.exerciseID)}
+          onPick={(id) => (pickerFor !== null ? replaceExercise(day.exercises[pickerFor].exerciseID, id) : addExercise(id))}
+          onOpenExercise={(id) => setInfoId(id)}
+          onClose={() => { setAddOpen(false); setPickerFor(null) }}
+        />
       )}
 
       {/* Карточка упражнения: фото с анимацией + техника */}
@@ -311,12 +290,4 @@ function Param({ label, value, onChange, step = 1 }: {
       </div>
     </div>
   )
-}
-
-function exercisePickerList(q: string, exclude: string[]) {
-  const query = q.trim().toLowerCase()
-  const excluded = new Set(exclude)
-  let list = [...CATALOG].filter((e) => !excluded.has(e.id))
-  if (query) list = list.filter((e) => e.name.toLowerCase().includes(query))
-  return list
 }

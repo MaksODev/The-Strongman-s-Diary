@@ -43,7 +43,6 @@ export function CatalogSheet({ title = 'Каталог упражнений', ex
       </div>
       <div className="px-4 pb-2">
         <input
-          autoFocus
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Поиск упражнения…"

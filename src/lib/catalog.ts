@@ -14,8 +14,11 @@ export function catalogDictionary(): Map<string, Exercise> {
   return byId
 }
 
+// У этих упражнений нет иллюстрации (388 из 390 имеют {id}.jpg)
+const NO_IMAGE = new Set(['high-knees', 'burpees'])
+
 export function exerciseImage(id: string): string | null {
-  // 388 из 390 упражнений имеют иллюстрацию {id}.jpg
+  if (NO_IMAGE.has(id)) return null
   return `${import.meta.env.BASE_URL}illustrations/${id}.jpg`
 }
 

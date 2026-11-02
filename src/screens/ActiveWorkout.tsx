@@ -1,6 +1,6 @@
 // MARK: - Активная тренировка: лог подходов, рекорды, тоннажные вехи, RPE.
 // Порт ActiveWorkoutView + связанных движков нативного приложения.
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import type { SetLog, WorkoutDay, WorkoutPlan, WorkoutSession } from '../types'
 import { useApp, type DraftItem, type DraftWorkout } from '../state/store'
 import { exerciseById, exerciseImage } from '../lib/catalog'
@@ -13,6 +13,7 @@ import { uid } from '../lib/storage'
 import { formatWeight } from '../types'
 import { PrimaryButton, SecondaryButton, Card, EmptyState, Modal } from '../components/ui'
 import { CatalogSheet } from '../components/CatalogSheet'
+import { RulerScale } from '../components/RulerScale'
 import { ExerciseInfoSheet } from '../components/ExerciseInfoSheet'
 import { InfoIcon } from '../components/icons'
 
@@ -491,7 +492,7 @@ function SetRow({ setIndex, log, repsRange, lastSet, onChange }: {
           </svg>
         </button>
         <div className="w-4 text-text-secondary text-[13px] font-semibold text-center shrink-0">{setIndex}</div>
-        <WeightScale
+        <RulerScale
           value={effective.actualWeightKg}
           planned={log.plannedWeightKg}
           onChange={(v) => onChange({ actualWeightKg: v })}
@@ -503,154 +504,6 @@ function SetRow({ setIndex, log, repsRange, lastSet, onChange }: {
         {log.plannedWeightKg > 0 && (
           <span className="text-[10px] text-text-disabled">план {formatWeight(log.plannedWeightKg)} кг</span>
         )}
-      </div>
-    </div>
-  )
-}
-
-// MARK: Весовая шкала-линейка: тяни пальцем или тапай для прыжка.
-// Тап по центральному числу — точный ввод с клавиатуры.
-function WeightScale({ value, planned, onChange }: {
-  value: number
-  planned?: number
-  onChange: (v: number) => void
-}) {
-  const STEP = 2.5
-  const MIN = 0
-  const MAX = 400
-  const SPAN = 40 // сколько кг видно на ленте одновременно
-  const ref = useRef<HTMLDivElement>(null)
-  const [width, setWidth] = useState(240)
-  const [editing, setEditing] = useState(false)
-  const [draftText, setDraftText] = useState('')
-  const valueRef = useRef(value)
-  valueRef.current = value
-
-  useEffect(() => {
-    const measure = () => {
-      if (ref.current) setWidth(ref.current.clientWidth)
-    }
-    measure()
-    window.addEventListener('resize', measure)
-    return () => window.removeEventListener('resize', measure)
-  }, [])
-
-  const pxPerKg = width / SPAN
-  const clampSnap = (v: number) => Math.min(MAX, Math.max(MIN, Math.round(v / STEP) * STEP))
-
-  const drag = useRef<{ startX: number; startVal: number; moved: boolean } | null>(null)
-  const valueBtnRef = useRef<HTMLButtonElement>(null)
-  const lastDragMoved = useRef(false)
-
-  const onPointerDown = (e: React.PointerEvent) => {
-    if (editing) return
-    // В некоторых окружениях (headless, stylus) захват указателя недоступен — не критично
-    try { ref.current?.setPointerCapture(e.pointerId) } catch { /* noop */ }
-    drag.current = { startX: e.clientX, startVal: valueRef.current, moved: false }
-  }
-  const onPointerMove = (e: React.PointerEvent) => {
-    const d = drag.current
-    if (!d) return
-    const dx = e.clientX - d.startX
-    if (Math.abs(dx) > 4) d.moved = true
-    if (d.moved) onChange(clampSnap(d.startVal + dx / pxPerKg))
-  }
-  const onPointerUp = (e: React.PointerEvent) => {
-    const d = drag.current
-    drag.current = null
-    if (!d) return
-    lastDragMoved.current = d.moved
-    if (!d.moved && ref.current) {
-      // Тап по центральной кнопке значения — там откроется редактор (onClick), прыжок не нужен
-      const btn = valueBtnRef.current?.getBoundingClientRect()
-      const onValueBtn = btn && e.clientX >= btn.left - 8 && e.clientX <= btn.right + 8
-      // NB: setPointerCapture перенаправляет click на контейнер, поэтому редактор
-      // открываем здесь, а не по onClick кнопки.
-      if (onValueBtn) {
-        setDraftText(formatWeight(valueRef.current))
-        setEditing(true)
-        return
-      }
-      // Тап: прыжок к точке касания относительно центра
-      const rect = ref.current.getBoundingClientRect()
-      const x = e.clientX - rect.left
-      onChange(clampSnap(valueRef.current + (x - width / 2) / pxPerKg))
-    }
-  }
-
-  // Риски вокруг текущего значения
-  const first = Math.max(MIN, Math.floor((value - SPAN / 2) / STEP) * STEP)
-  const ticks: number[] = []
-  for (let v = first; v <= Math.min(MAX, value + SPAN / 2); v += STEP) ticks.push(v)
-
-  const commitText = () => {
-    const v = parseFloat(draftText.replace(',', '.'))
-    if (!isNaN(v) && v >= MIN) onChange(clampSnap(v))
-    setEditing(false)
-  }
-
-  return (
-    <div ref={ref}
-      className="relative flex-1 min-w-0 h-11 rounded-[14px] bg-elevated border border-white/10 overflow-hidden touch-none select-none cursor-ew-resize"
-      onPointerDown={onPointerDown}
-      onPointerMove={onPointerMove}
-      onPointerUp={onPointerUp}
-      onPointerCancel={() => { drag.current = null }}>
-      {/* Риски ленты */}
-      {ticks.map((v) => {
-        const offset = (v - value) * pxPerKg
-        const major = v % 10 === 0
-        return (
-          <div key={v} className="absolute bottom-0 pointer-events-none" style={{ left: `calc(50% + ${offset}px)` }}>
-            <div className={`w-px mx-auto ${major ? 'h-2.5 bg-white/35' : 'h-1.5 bg-white/15'}`} />
-            {major && (
-              <div className="absolute -bottom-0 left-1/2 -translate-x-1/2 translate-y-full pt-1 text-[8px] font-semibold text-text-disabled whitespace-nowrap">
-                {v}
-              </div>
-            )}
-          </div>
-        )
-      })}
-      {/* Маркер плана */}
-      {planned != null && planned > 0 && Math.abs(planned - value) < SPAN / 2 && (
-        <div className="absolute bottom-0 pointer-events-none" style={{ left: `calc(50% + ${(planned - value) * pxPerKg}px)` }}>
-          <div className="w-[3px] h-2 rounded-full bg-flash -translate-x-1/2" />
-        </div>
-      )}
-      {/* Затемнение краёв */}
-      <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-elevated to-transparent pointer-events-none" />
-      <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-elevated to-transparent pointer-events-none" />
-      {/* Центральное риско-указатель */}
-      <div className="absolute left-1/2 -translate-x-1/2 top-0 w-[2px] h-2.5 bg-accent rounded-b pointer-events-none" />
-      {/* Число по центру */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        {editing ? (
-          <input
-            autoFocus
-            type="number"
-            inputMode="decimal"
-            value={draftText}
-            onFocus={(e) => e.target.select()}
-            onChange={(e) => setDraftText(e.target.value)}
-            onBlur={commitText}
-            onKeyDown={(e) => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur() }}
-            onPointerDown={(e) => e.stopPropagation()}
-            className="w-16 bg-transparent text-center text-ink font-digits text-[16px] outline-none pointer-events-auto"
-          />
-        ) : (
-          <button
-            ref={valueBtnRef}
-            onClick={() => {
-              // Клик после перетаскивания (жест начался на кнопке) не открывает редактор
-              if (lastDragMoved.current) return
-              setDraftText(formatWeight(value))
-              setEditing(true)
-            }}
-            className="pointer-events-auto font-digits text-[16px] text-ink bg-elevated/90 px-1.5 rounded-md"
-            aria-label="ввести вес вручную"
-          >{formatWeight(value)}</button>
-        )}
-        <span className="text-text-secondary text-[10px] ml-0.5 mt-0.5">кг</span>
       </div>
     </div>
   )

@@ -2,7 +2,7 @@
 
 export type Sex = 'male' | 'female'
 export type TrainingExperience = 'beginner' | 'months6to12' | 'years1to3' | 'years3plus'
-export type TrainingGoal = 'mass' | 'strength' | 'endurance' | 'definition' | 'generalFitness'
+export type TrainingGoal = 'fatLoss' | 'recomposition' | 'mass' | 'strength' | 'endurance' | 'definition' | 'generalFitness'
 export type Equipment = 'gym' | 'dumbbells' | 'pullupBar' | 'resistanceBands' | 'bodyweight' | 'bench'
 export type PeriodizationScheme = 'heavyLight' | 'twoHeavyOneLight' | 'threeUpDeload' | 'linear' | 'custom'
 export type WeekLoadType = 'heavy' | 'rampUp' | 'light' | 'deload'
@@ -115,6 +115,8 @@ export const EXPERIENCE_TITLES: Record<TrainingExperience, string> = {
 }
 
 export const GOAL_TITLES: Record<TrainingGoal, string> = {
+  fatLoss: 'Похудение',
+  recomposition: 'Рекомпозиция',
   mass: 'Масса',
   strength: 'Сила',
   endurance: 'Выносливость',
