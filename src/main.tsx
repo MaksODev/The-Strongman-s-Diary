@@ -3,6 +3,10 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 import { AppProvider } from './state/store'
+import { registerSW } from 'virtual:pwa-register'
+
+// autoUpdate: новая версия активируется и страница перезагружается сама
+registerSW({ immediate: true })
 
 // iOS PWA (black-translucent): innerHeight короче экрана на высоту статус-бара,
 // из-за чего снизу остаётся пустая полоса. Достраиваем высоту до полного экрана.

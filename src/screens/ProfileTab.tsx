@@ -149,6 +149,9 @@ export function ProfileTab() {
           <div className="text-center text-text-disabled text-[11px]">
             Дневник силача · веб-версия {plan ? `· ${plan.name}` : ''}
           </div>
+          <div className="text-center text-text-disabled text-[10px] mt-1">
+            сборка {__BUILD__} · inner {window.innerHeight} · app-h {document.documentElement.style.getPropertyValue('--app-h') || '—'}
+          </div>
         </div>
       </div>
 

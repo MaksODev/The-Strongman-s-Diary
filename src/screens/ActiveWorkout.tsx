@@ -236,7 +236,7 @@ export function ActiveWorkout({ draft, onFinish, onAbort }: {
   })
 
   return (
-    <div className="h-full flex flex-col bg-bg safe-top safe-bottom">
+    <div className="h-full flex flex-col bg-bg safe-top">
       {/* Шапка */}
       <div className="px-4 pt-3 pb-2 flex items-center justify-between border-b border-elevated">
         <div>
