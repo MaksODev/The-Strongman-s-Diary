@@ -77,19 +77,27 @@ function pickExercises(
   const result: Exercise[] = []
   const taken = new Set<string>()
 
-  // 1) По одному базовому на каждую целевую группу (в порядке приоритета)
-  for (const muscle of muscles) {
-    const candidates = available.filter(
-      (e) => e.primaryMuscles.includes(muscle) && !used.has(e.id) && !taken.has(e.id),
-    )
-    const best = bestMatch(candidates, experience)
-    if (best) {
-      result.push(best)
-      taken.add(best.id)
+  // 1) Набираем упражнения по целевым группам циклами: главная группа дня идёт с двойным весом,
+  //    остальные по одному — чтобы «тянущий» день не заполнялся случайными жимами.
+  const order = muscles.flatMap((m, i) => (i === 0 && muscles.length > 1 ? [m, m] : [m]))
+  let progressed = true
+  while (result.length < count && progressed) {
+    progressed = false
+    for (const muscle of order) {
+      if (result.length >= count) break
+      const candidates = available.filter(
+        (e) => e.primaryMuscles.includes(muscle) && !used.has(e.id) && !taken.has(e.id),
+      )
+      const best = bestMatch(candidates, experience)
+      if (best) {
+        result.push(best)
+        taken.add(best.id)
+        progressed = true
+      }
     }
   }
 
-  // 2) Добиваем до лимита времени остальными доступными
+  // 2) Если целевых групп не хватило — добиваем остальными доступными
   if (result.length < count) {
     const rest = available
       .filter((e) => !taken.has(e.id) && !e.primaryMuscles.includes('cardio'))

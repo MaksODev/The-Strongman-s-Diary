@@ -1,9 +1,9 @@
 // MARK: - Всплывающее окно упражнения: «живое» фото (кен-бёрнс) и техника выполнения
 import { exerciseById, exerciseImage } from '../lib/catalog'
 import { MUSCLE_TITLES } from '../types'
-import { SecondaryButton, Modal } from './ui'
+import { PrimaryButton, SecondaryButton, Modal } from './ui'
 
-export function ExerciseInfoSheet({ exerciseId, onClose }: { exerciseId: string; onClose: () => void }) {
+export function ExerciseInfoSheet({ exerciseId, onClose, onAdd }: { exerciseId: string; onClose: () => void; onAdd?: () => void }) {
   const exercise = exerciseById(exerciseId)
   if (!exercise) return null
   const img = exerciseImage(exercise.id)
@@ -39,6 +39,8 @@ export function ExerciseInfoSheet({ exerciseId, onClose }: { exerciseId: string;
         </ol>
       </div>
       <div className="h-3" />
+      {onAdd && <PrimaryButton onClick={onAdd}>Добавить в тренировку</PrimaryButton>}
+      {onAdd && <div className="h-2" />}
       <SecondaryButton onClick={onClose}>Закрыть</SecondaryButton>
     </Modal>
   )

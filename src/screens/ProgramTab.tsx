@@ -261,7 +261,6 @@ export function DayEdit({ dayOrderIndex, onBack }: { dayOrderIndex: number; onBa
           title={pickerFor !== null ? 'Заменить упражнение' : 'Добавить упражнение'}
           exclude={day.exercises.map((e) => e.exerciseID)}
           onPick={(id) => (pickerFor !== null ? replaceExercise(day.exercises[pickerFor].exerciseID, id) : addExercise(id))}
-          onOpenExercise={(id) => setInfoId(id)}
           onClose={() => { setAddOpen(false); setPickerFor(null) }}
         />
       )}

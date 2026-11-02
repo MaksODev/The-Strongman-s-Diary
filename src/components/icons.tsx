@@ -117,3 +117,22 @@ export function SproutIcon(props: IconProps) {
     </svg>
   )
 }
+
+export function PlayIcon(props: IconProps) {
+  return (
+    <svg {...base({ width: 20, height: 20, fill: 'currentColor', stroke: 'none', ...props })}>
+      <path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z" />
+    </svg>
+  )
+}
+
+export function TrashIcon(props: IconProps) {
+  return (
+    <svg {...base({ width: 20, height: 20, ...props })}>
+      <path d="M4 7h16" />
+      <path d="M9 7V4.5h6V7" />
+      <path d="M6.5 7l.8 12.2a1 1 0 0 0 1 .8h7.4a1 1 0 0 0 1-.8L17.5 7" />
+      <path d="M10 11v5M14 11v5" />
+    </svg>
+  )
+}

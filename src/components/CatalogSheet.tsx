@@ -5,14 +5,15 @@ import { CATALOG, exerciseImage } from '../lib/catalog'
 import type { Difficulty, Equipment, Exercise, MuscleGroup } from '../types'
 import { DIFFICULTY_TITLES, EQUIPMENT_TITLES, MUSCLE_TITLES } from '../types'
 import { Chip, EmptyState } from './ui'
+import { ExerciseInfoSheet } from './ExerciseInfoSheet'
 
-export function CatalogSheet({ title = 'Каталог упражнений', exclude, onPick, onOpenExercise, onClose }: {
+export function CatalogSheet({ title = 'Каталог упражнений', exclude, onPick, onClose }: {
   title?: string
   exclude?: string[]
   onPick: (id: string) => void
-  onOpenExercise?: (id: string) => void
   onClose: () => void
 }) {
+  const [infoId, setInfoId] = useState<string | null>(null)
   const [query, setQuery] = useState('')
   const [muscle, setMuscle] = useState<MuscleGroup | null>(null)
   const [equipment, setEquipment] = useState<Equipment | null>(null)
@@ -24,7 +25,7 @@ export function CatalogSheet({ title = 'Каталог упражнений', ex
     return CATALOG.filter((e) => {
       if (excluded.has(e.id)) return false
       if (q && !e.name.toLowerCase().includes(q)) return false
-      if (muscle && !e.primaryMuscles.includes(muscle) && !e.secondaryMuscles.includes(muscle)) return false
+      if (muscle && !e.primaryMuscles.includes(muscle)) return false
       if (equipment && !e.equipment.includes(equipment)) return false
       if (difficulty && e.difficulty !== difficulty) return false
       return true
@@ -80,25 +81,31 @@ export function CatalogSheet({ title = 'Каталог упражнений', ex
 
       {/* Сетка */}
       <div className="flex-1 overflow-y-auto px-4 py-2 pb-6">
-        <div className="text-text-secondary text-[12px] mb-2">{filtered.length} упражнений · тапни, чтобы добавить</div>
+        <div className="text-text-secondary text-[12px] mb-2">{filtered.length} упражнений · тап — описание, «+» — добавить</div>
         {filtered.length === 0 && <EmptyState emoji="🔍" title="Ничего не найдено" subtitle="Попробуй изменить фильтры" />}
         <div className="grid grid-cols-2 gap-2.5">
           {filtered.map((e) => (
             <div key={e.id} className="relative">
-              <ExerciseCard exercise={e} onClick={() => onPick(e.id)} />
-              {onOpenExercise && (
-                <button
-                  onClick={() => onOpenExercise(e.id)}
-                  aria-label="подробнее об упражнении"
-                  className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/55 backdrop-blur-sm text-white text-[13px] font-bold flex items-center justify-center"
-                >
-                  i
-                </button>
-              )}
+              <ExerciseCard exercise={e} onClick={() => setInfoId(e.id)} />
+              <button
+                onClick={() => onPick(e.id)}
+                aria-label={`добавить ${e.name}`}
+                className="btn-brutal btn-flash absolute top-2 right-2 w-8 h-8 rounded-full text-[20px] font-bold leading-none flex items-center justify-center"
+              >
+                +
+              </button>
             </div>
           ))}
         </div>
       </div>
+
+      {infoId && (
+        <ExerciseInfoSheet
+          exerciseId={infoId}
+          onClose={() => setInfoId(null)}
+          onAdd={() => { const id = infoId; setInfoId(null); onPick(id) }}
+        />
+      )}
     </div>
   )
 }

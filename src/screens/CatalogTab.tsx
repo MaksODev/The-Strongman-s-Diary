@@ -15,7 +15,7 @@ export function CatalogTab({ onOpenExercise }: { onOpenExercise: (id: string) =>
     const q = query.trim().toLowerCase()
     return CATALOG.filter((e) => {
       if (q && !e.name.toLowerCase().includes(q)) return false
-      if (muscle && !e.primaryMuscles.includes(muscle) && !e.secondaryMuscles.includes(muscle)) return false
+      if (muscle && !e.primaryMuscles.includes(muscle)) return false
       if (equipment && !e.equipment.includes(equipment)) return false
       if (difficulty && e.difficulty !== difficulty) return false
       return true

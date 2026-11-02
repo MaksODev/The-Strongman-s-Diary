@@ -1,5 +1,5 @@
 // MARK: - Главный таб «Тренировка»: серия, неделя цикла, дни программы (старт и правка карандашом).
-import { useMemo } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useApp } from '../state/store'
 import { currentWeek, cycle } from '../lib/periodization'
 import { evaluateStreak, WEEKS_TO_EARN } from '../lib/streakFreeze'
@@ -10,14 +10,15 @@ import {
 import { CONSISTENCY_FACTS, RECOVERY_FACTS } from '../lib/catalog'
 import type { WorkoutDay } from '../types'
 import { WEEK_TYPE_COLORS, WEEK_TYPE_TITLES } from '../types'
-import { Card, SecondaryButton, SectionTitle } from '../components/ui'
-import { FlameIcon, ShieldIcon, SproutIcon, PencilIcon } from '../components/icons'
+import { Card, Modal, PrimaryButton, SecondaryButton, SectionTitle } from '../components/ui'
+import { FlameIcon, ShieldIcon, SproutIcon, PencilIcon, PlayIcon, TrashIcon } from '../components/icons'
 
 export function WorkoutTab({ onStartDay, onEditDay }: {
   onStartDay: (dayOrderIndex: number) => void
   onEditDay: (dayOrderIndex: number) => void
 }) {
   const { profile, plan, sessions, updatePlan } = useApp()
+  const [dayToDelete, setDayToDelete] = useState<WorkoutDay | null>(null)
 
   const streak = useMemo(() => {
     if (!profile) return null
@@ -155,49 +156,140 @@ export function WorkoutTab({ onStartDay, onEditDay }: {
         {plan.days.map((day) => (
           <DayCard key={day.orderIndex} day={day} done={doneThisWeek.has(day.name)}
             onStart={() => onStartDay(day.orderIndex)}
-            onEdit={() => onEditDay(day.orderIndex)} />
+            onEdit={() => onEditDay(day.orderIndex)}
+            onDelete={() => setDayToDelete(day)} />
         ))}
 
         <SecondaryButton onClick={() => onEditDay(-1)}>+ Добавить тренировку</SecondaryButton>
       </div>
+
+      {dayToDelete && (
+        <Modal onClose={() => setDayToDelete(null)}>
+          <h3 className="font-bold text-[17px] text-center mb-2">Удалить «{dayToDelete.name}»?</h3>
+          <p className="text-text-secondary text-[14px] text-center mb-4">
+            Тренировка будет удалена из программы. История выполненных тренировок сохранится.
+          </p>
+          <PrimaryButton onClick={() => {
+            updatePlan({
+              ...plan,
+              days: plan.days.filter((d) => d.orderIndex !== dayToDelete.orderIndex).map((d, i) => ({ ...d, orderIndex: i })),
+            })
+            setDayToDelete(null)
+          }}>Удалить</PrimaryButton>
+          <div className="h-2" />
+          <SecondaryButton onClick={() => setDayToDelete(null)}>Отмена</SecondaryButton>
+        </Modal>
+      )}
     </div>
   )
 }
 
-// MARK: Карточка дня: старт тренировки и правка через карандаш (экран редактирования дня)
-function DayCard({ day, done, onStart, onEdit }: {
+// MARK: Карточка дня: тап — старт тренировки, свайп влево — удаление (как в iOS),
+// карандаш — правка дня, иконка play — старт.
+const REVEAL = 88
+
+function DayCard({ day, done, onStart, onEdit, onDelete }: {
   day: WorkoutDay
   done: boolean
   onStart: () => void
   onEdit: () => void
+  onDelete: () => void
 }) {
+  const [dx, setDx] = useState(0)
+  const [open, setOpen] = useState(false)
+  const [dragging, setDragging] = useState(false)
+  const drag = useRef<{ x: number; base: number; moved: boolean } | null>(null)
+  const suppressClick = useRef(false)
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    drag.current = { x: e.clientX, base: open ? -REVEAL : 0, moved: false }
+  }
+  const onPointerMove = (e: React.PointerEvent) => {
+    const d = drag.current
+    if (!d) return
+    const delta = e.clientX - d.x
+    if (!d.moved && Math.abs(delta) > 8) { d.moved = true; setDragging(true) }
+    if (d.moved) setDx(Math.max(-REVEAL * 1.6, Math.min(0, d.base + delta)))
+  }
+  const finish = () => {
+    const d = drag.current
+    drag.current = null
+    setDragging(false)
+    if (!d?.moved) return
+    suppressClick.current = true
+    if (dx < -REVEAL * 1.35) {
+      // длинный свайп — сразу запрашиваем удаление
+      setOpen(false)
+      setDx(0)
+      onDelete()
+    } else {
+      const nextOpen = dx < -REVEAL / 2
+      setOpen(nextOpen)
+      setDx(nextOpen ? -REVEAL : 0)
+    }
+  }
+  const close = () => { setOpen(false); setDx(0) }
+
+  const handleClick = () => {
+    if (suppressClick.current) { suppressClick.current = false; return }
+    if (open) { close(); return }
+    if (!done) onStart()
+  }
+
   return (
-    <Card className={`p-4 flex items-center gap-2.5 ${done ? 'opacity-60' : ''}`}>
-      <div className="flex-1 min-w-0">
-        <div className="font-semibold text-[15px] flex items-center gap-2">
-          {done && <span className="text-accent">✓</span>}
-          {day.name}
-        </div>
-        <div className="text-text-secondary text-[12px] mt-0.5 truncate">
-          {day.exercises.length} упражнений · {day.exercises.reduce((s, e) => s + e.sets, 0)} подходов
-        </div>
-      </div>
+    <div className="relative rounded-[22px] overflow-hidden">
+      {/* Красная зона удаления: ширина равна открытому участку */}
       <button
-        onClick={onEdit}
-        aria-label="редактировать тренировку"
-        className="w-9 h-9 rounded-[12px] bg-elevated border border-white/10 text-text-secondary flex items-center justify-center shrink-0 active:text-ink"
+        onClick={() => { close(); onDelete() }}
+        aria-label={`удалить тренировку ${day.name}`}
+        className="absolute inset-y-0 right-0 bg-[#ef4444] text-white flex flex-col items-center justify-center gap-0.5 overflow-hidden whitespace-nowrap text-[11px] font-bold"
+        style={{ width: Math.max(0, -dx) }}
       >
-        <PencilIcon />
+        <TrashIcon />
+        Удалить
       </button>
-      {!done && (
-        <button
-          onClick={onStart}
-          className="btn-brutal btn-flash shrink-0 px-5 py-2.5 rounded-[14px] font-extrabold text-[14px]"
-        >
-          Начать
-        </button>
-      )}
-    </Card>
+      <div
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={finish}
+        onPointerCancel={finish}
+        onClick={handleClick}
+        role="button"
+        className="relative touch-pan-y"
+        style={{
+          transform: `translateX(${dx}px)`,
+          transition: dragging ? 'none' : 'transform 0.22s ease',
+        }}
+      >
+        <Card className={`p-4 flex items-center gap-2.5 ${done ? 'opacity-60' : 'active:brightness-110'}`}>
+          <div className="flex-1 min-w-0">
+            <div className="font-semibold text-[15px] flex items-center gap-2">
+              {done && <span className="text-accent">✓</span>}
+              {day.name}
+            </div>
+            <div className="text-text-secondary text-[12px] mt-0.5 truncate">
+              {day.exercises.length} упражнений · {day.exercises.reduce((s, e) => s + e.sets, 0)} подходов
+            </div>
+          </div>
+          <button
+            onClick={(e) => { e.stopPropagation(); onEdit() }}
+            aria-label="редактировать тренировку"
+            className="w-9 h-9 rounded-[12px] bg-elevated border border-white/10 text-text-secondary flex items-center justify-center shrink-0 active:text-ink"
+          >
+            <PencilIcon />
+          </button>
+          {!done && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onStart() }}
+              aria-label={`начать тренировку ${day.name}`}
+              className="btn-brutal btn-flash shrink-0 w-11 h-11 rounded-full flex items-center justify-center"
+            >
+              <PlayIcon className="translate-x-px" />
+            </button>
+          )}
+        </Card>
+      </div>
+    </div>
   )
 }
 
