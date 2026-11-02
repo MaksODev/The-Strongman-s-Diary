@@ -1,0 +1,154 @@
+@import '@fontsource/manrope/400.css';
+@import '@fontsource/manrope/500.css';
+@import '@fontsource/manrope/600.css';
+@import '@fontsource/manrope/700.css';
+@import '@fontsource/manrope/800.css';
+@import '@fontsource/dotgothic16/400.css';
+@import "tailwindcss";
+
+@theme {
+  /* Палитра: тёмный «премиальный дашборд» (по референсу) */
+  --color-bg: #0a0a0e;          /* глубокий чёрный с синевой */
+  --color-card: #15151c;         /* тёмная плитка */
+  --color-elevated: #1e1e28;     /* приподнятая плитка */
+  --color-accent: #8b5cf6;       /* фиолетовый */
+  --color-accent-deep: #5b3df0;  /* глубокий индиго */
+  --color-flash: #ffd400;        /* жёлтая вспышка */
+  --color-ink: #f4f4f6;          /* почти белый (текст) */
+  --color-text-primary: #f4f4f6;
+  --color-text-secondary: #9b9ba8;
+  --color-text-disabled: #55555f;
+
+  /* Индикация периодизации */
+  --color-heavy: #ff7a5c;        /* коралловый */
+  --color-ramp: #ffd400;         /* солнечный */
+  --color-light-week: #34d399;   /* мятный */
+  --color-deload: #6e8bff;       /* небесный */
+
+  --color-coral: #ff7a5c;
+  --color-sun: #ffd400;
+  --color-sky: #6e8bff;
+
+  --font-display: "Manrope", -apple-system, sans-serif;
+  --font-body: "Manrope", -apple-system, sans-serif;
+  --font-digits: "DotGothic16", "Manrope", monospace;
+
+  --radius-card: 22px;
+}
+
+html, body, #root {
+  height: 100%;
+  background: #0a0a0e;
+  color: #f4f4f6;
+  overscroll-behavior: none;
+}
+
+/* Мягкое свечение фона, как на референсе */
+body {
+  font-family: "Manrope", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 500;
+  background:
+    radial-gradient(120% 60% at 50% -10%, rgba(139, 92, 246, 0.14), transparent 60%),
+    #0a0a0e;
+  background-attachment: fixed;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+input, textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* MARK: - «Стеклянные» приёмы тёмной темы */
+/* Жёсткие бруталистские тени заменяем на мягкие глубокие */
+.shadow-brutal { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.05); }
+.shadow-brutal-sm { box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05); }
+.shadow-brutal-lg { box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06); }
+
+/* Нажатие: лёгкое сжатие вместо «вдавливания» тени */
+.btn-brutal { transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease; }
+.btn-brutal:active { transform: scale(0.97); box-shadow: none !important; }
+
+/* Бывшая чёрная обводка — теперь едва заметная светлая кромка */
+.border-ink { border-color: rgba(255, 255, 255, 0.09) !important; }
+
+/* Пилюля-бейдж */
+.sticker {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  font-weight: 800;
+}
+
+/* Пиксельные цифры в стиле референса */
+.font-digits { font-family: "DotGothic16", "Manrope", monospace; letter-spacing: 0.04em; }
+
+/* Фиолетовая градиентная плитка (как «Strain» на референсе) */
+.tile-violet {
+  background: linear-gradient(140deg, #a855f7 0%, #6d3df0 100%);
+  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+/* Индиго-плитка (как «Sync») */
+.tile-indigo {
+  background: linear-gradient(140deg, #4c3aff 0%, #2b1fa8 100%);
+  box-shadow: 0 10px 30px rgba(76, 58, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+/* Тёмная стеклянная плитка */
+.tile-glass {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+/* Жёлтая акцентная кнопка (как нижняя на референсе) */
+.btn-flash {
+  background: linear-gradient(160deg, #ffe14d 0%, #ffc800 100%);
+  color: #0a0a0e;
+  box-shadow: 0 10px 28px rgba(255, 212, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* Анимация влёта ачивок и рекордов */
+@keyframes pop-in {
+  0% { opacity: 0; transform: scale(0.6) translateY(12px); }
+  60% { transform: scale(1.05) translateY(-2px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+.animate-pop-in { animation: pop-in 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.animate-float { animation: float-slow 2.2s ease-in-out infinite; }
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
+}
+.animate-wiggle { animation: wiggle 0.8s ease-in-out infinite; }
+
+/* Заполнение прогресс-бара заряда страховки */
+@keyframes charge-fill { from { width: 0; } to { width: var(--charge, 0%); } }
+.animate-charge { animation: charge-fill 0.8s ease-out both; }
+
+/* «Живое» фото упражнения: медленный кен-бёрнс в цикле */
+@keyframes ken-burns {
+  0% { transform: scale(1.04) translate(0%, 0%); }
+  50% { transform: scale(1.16) translate(-1.5%, 1.5%); }
+  100% { transform: scale(1.04) translate(1.5%, -1%); }
+}
+.animate-kenburns { animation: ken-burns 14s ease-in-out infinite; }
+
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+.safe-top { padding-top: env(safe-area-inset-top); }
+
+/* Убираем стрелки у number-инпутов */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
