@@ -149,6 +149,7 @@ export function ProfileTab() {
           <div className="text-center text-text-disabled text-[11px]">
             Дневник силача · веб-версия {plan ? `· ${plan.name}` : ''}
           </div>
+          <ViewportDebug />
         </div>
       </div>
 
@@ -380,5 +381,20 @@ function MeasureField({ label, value, onChange }: { label: string; value: string
         className="mt-1 w-full bg-elevated border border-white/10 rounded-[14px] px-4 py-3 text-ink font-semibold text-[15px] outline-none focus:ring-2 ring-accent/60 font-digits"
       />
     </label>
+  )
+}
+
+// Временная диагностика вьюпорта (убрать после настройки отступов)
+function ViewportDebug() {
+  const probe = document.createElement('div')
+  probe.style.cssText = 'position:fixed;visibility:hidden;padding-bottom:env(safe-area-inset-bottom)'
+  document.body.appendChild(probe)
+  const inset = getComputedStyle(probe).paddingBottom
+  probe.remove()
+  const standalone = (navigator as Navigator & { standalone?: boolean }).standalone === true
+  return (
+    <div className="text-center text-text-disabled text-[10px] mt-1">
+      inner {window.innerWidth}×{window.innerHeight} · screen {screen.width}×{screen.height} · inset {inset} · standalone {String(standalone)}
+    </div>
   )
 }
