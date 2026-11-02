@@ -32,7 +32,7 @@ export function CatalogSheet({ title = 'Каталог упражнений', ex
   }, [query, muscle, equipment, difficulty, exclude])
 
   return (
-    <div className="fixed inset-0 bg-bg z-40 flex flex-col safe-top safe-bottom">
+    <div className="fixed inset-x-0 top-0 bg-bg z-40 flex flex-col safe-top safe-bottom" style={{ height: 'var(--app-h, 100%)' }}>
       {/* Шапка */}
       <div className="px-4 pt-4 pb-2 flex items-center gap-3">
         <h2 className="font-display font-bold text-[19px] flex-1">{title}</h2>

@@ -37,7 +37,7 @@
 }
 
 html, body, #root {
-  height: 100%;
+  height: var(--app-h, 100%);
   background: #0a0a0e;
   color: #f4f4f6;
   overscroll-behavior: none;

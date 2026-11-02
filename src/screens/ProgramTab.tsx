@@ -257,7 +257,7 @@ export function DayEdit({ dayOrderIndex, onBack }: { dayOrderIndex: number; onBa
 
       {/* Пикер: добавление или замена */}
       {(addOpen || pickerFor !== null) && (
-        <div className="fixed inset-0 bg-bg z-40 flex flex-col safe-top safe-bottom">
+        <div className="fixed inset-x-0 top-0 bg-bg z-40 flex flex-col safe-top safe-bottom" style={{ height: 'var(--app-h, 100%)' }}>
           <div className="px-4 py-3 flex items-center gap-3 border-b border-elevated">
             <input autoFocus value={query} onChange={(e) => setQuery(e.target.value)}
               placeholder="Поиск упражнения…"
