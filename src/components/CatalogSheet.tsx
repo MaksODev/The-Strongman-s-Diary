@@ -4,16 +4,23 @@ import { useMemo, useState } from 'react'
 import { CATALOG, exerciseImage } from '../lib/catalog'
 import type { Difficulty, Equipment, Exercise, MuscleGroup } from '../types'
 import { DIFFICULTY_TITLES, EQUIPMENT_TITLES, MUSCLE_TITLES } from '../types'
-import { Chip, EmptyState } from './ui'
+import { Chip, EmptyState, PrimaryButton, SecondaryButton } from './ui'
 import { ExerciseInfoSheet } from './ExerciseInfoSheet'
 
-export function CatalogSheet({ title = 'Каталог упражнений', exclude, onPick, onClose }: {
+export function CatalogSheet({ title = 'Каталог упражнений', exclude, onPick, multi, onClose }: {
   title?: string
   exclude?: string[]
-  onPick: (id: string) => void
+  /** Режим одиночного выбора: «+» сразу вызывает onPick */
+  onPick?: (id: string) => void
+  /** Режим множественного выбора: «+» отмечает упражнение, снизу — подтверждение или отмена */
+  multi?: { confirmLabel: string; onConfirm: (ids: string[]) => void }
   onClose: () => void
 }) {
   const [infoId, setInfoId] = useState<string | null>(null)
+  const [selected, setSelected] = useState<string[]>([])
+  const toggle = (id: string) =>
+    setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
+  const choose = (id: string) => (multi ? toggle(id) : onPick?.(id))
   const [query, setQuery] = useState('')
   const [muscle, setMuscle] = useState<MuscleGroup | null>(null)
   const [equipment, setEquipment] = useState<Equipment | null>(null)
@@ -81,29 +88,50 @@ export function CatalogSheet({ title = 'Каталог упражнений', ex
 
       {/* Сетка */}
       <div className="flex-1 overflow-y-auto px-4 py-2 pb-6">
-        <div className="text-text-secondary text-[12px] mb-2">{filtered.length} упражнений · тап — описание, «+» — добавить</div>
+        <div className="text-text-secondary text-[12px] mb-2">{filtered.length} упражнений · тап — описание, «+» — {multi ? 'отметить' : 'добавить'}</div>
         {filtered.length === 0 && <EmptyState emoji="🔍" title="Ничего не найдено" subtitle="Попробуй изменить фильтры" />}
         <div className="grid grid-cols-2 gap-2.5">
           {filtered.map((e) => (
             <div key={e.id} className="relative">
               <ExerciseCard exercise={e} onClick={() => setInfoId(e.id)} />
-              <button
-                onClick={() => onPick(e.id)}
-                aria-label={`добавить ${e.name}`}
-                className="btn-brutal btn-flash absolute top-2 right-2 w-8 h-8 rounded-full text-[20px] font-bold leading-none flex items-center justify-center"
-              >
-                +
-              </button>
+              {selected.includes(e.id) ? (
+                <button
+                  onClick={() => toggle(e.id)}
+                  aria-label={`убрать ${e.name}`}
+                  className="btn-brutal absolute top-2 right-2 w-8 h-8 rounded-full bg-[#22c55e] text-white flex items-center justify-center"
+                  style={{ boxShadow: '0 6px 16px rgba(34,197,94,0.4)' }}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 7" /></svg>
+                </button>
+              ) : (
+                <button
+                  onClick={() => choose(e.id)}
+                  aria-label={`добавить ${e.name}`}
+                  className="btn-brutal btn-flash absolute top-2 right-2 w-8 h-8 rounded-full text-[20px] font-bold leading-none flex items-center justify-center"
+                >
+                  +
+                </button>
+              )}
             </div>
           ))}
         </div>
       </div>
 
+      {multi && (
+        <div className="px-4 py-3 border-t border-elevated flex gap-2">
+          <SecondaryButton className="!w-auto px-5" onClick={onClose}>Отменить</SecondaryButton>
+          <PrimaryButton disabled={selected.length === 0} onClick={() => multi.onConfirm(selected)}>
+            {multi.confirmLabel}{selected.length > 0 ? ` (${selected.length})` : ''}
+          </PrimaryButton>
+        </div>
+      )}
+
       {infoId && (
         <ExerciseInfoSheet
           exerciseId={infoId}
           onClose={() => setInfoId(null)}
-          onAdd={() => { const id = infoId; setInfoId(null); onPick(id) }}
+          addLabel={multi ? (selected.includes(infoId) ? 'Убрать из выбранных' : 'Отметить') : undefined}
+          onAdd={() => { const id = infoId; setInfoId(null); choose(id) }}
         />
       )}
     </div>

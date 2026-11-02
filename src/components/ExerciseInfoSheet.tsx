@@ -3,7 +3,7 @@ import { exerciseById, exerciseImage } from '../lib/catalog'
 import { MUSCLE_TITLES } from '../types'
 import { PrimaryButton, SecondaryButton, Modal } from './ui'
 
-export function ExerciseInfoSheet({ exerciseId, onClose, onAdd }: { exerciseId: string; onClose: () => void; onAdd?: () => void }) {
+export function ExerciseInfoSheet({ exerciseId, onClose, onAdd, addLabel = 'Добавить в тренировку' }: { exerciseId: string; onClose: () => void; onAdd?: () => void; addLabel?: string }) {
   const exercise = exerciseById(exerciseId)
   if (!exercise) return null
   const img = exerciseImage(exercise.id)
@@ -39,7 +39,7 @@ export function ExerciseInfoSheet({ exerciseId, onClose, onAdd }: { exerciseId: 
         </ol>
       </div>
       <div className="h-3" />
-      {onAdd && <PrimaryButton onClick={onAdd}>Добавить в тренировку</PrimaryButton>}
+      {onAdd && <PrimaryButton onClick={onAdd}>{addLabel}</PrimaryButton>}
       {onAdd && <div className="h-2" />}
       <SecondaryButton onClick={onClose}>Закрыть</SecondaryButton>
     </Modal>

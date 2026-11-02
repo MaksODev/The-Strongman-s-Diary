@@ -115,9 +115,7 @@ export function DayEdit({ dayOrderIndex, onBack }: { dayOrderIndex: number; onBa
     : plan.days.find((d) => d.orderIndex === dayOrderIndex)!
 
   const commitDay = (updated: WorkoutDay) => {
-    const days = isNew
-      ? [...plan.days, updated]
-      : plan.days.map((d) => (d.orderIndex === dayOrderIndex ? updated : d))
+    const days = plan.days.map((d) => (d.orderIndex === dayOrderIndex ? updated : d))
     updatePlan({ ...plan, days: days.map((d, i) => ({ ...d, orderIndex: i })) })
   }
 
@@ -157,6 +155,30 @@ export function DayEdit({ dayOrderIndex, onBack }: { dayOrderIndex: number; onBa
 
   const removeExercise = (id: string) => {
     commitDay({ ...day, exercises: day.exercises.filter((e) => e.exerciseID !== id) })
+  }
+
+  // Новая тренировка: выбираем упражнения в каталоге и создаём день только по подтверждению
+  const createDay = (ids: string[]) => {
+    const exercises: DayExercise[] = ids.flatMap((id, i) => {
+      const ex = exerciseById(id)
+      return ex ? [{
+        exerciseID: ex.id, orderIndex: i,
+        sets: 3, repsMin: ex.repsMin, repsMax: ex.repsMax,
+        baseWeightKg: 0, targetWeightKg: 0, restSeconds: 90,
+      }] : []
+    })
+    updatePlan({ ...plan, days: [...plan.days, { name: day.name, orderIndex: plan.days.length, exercises }] })
+    onBack()
+  }
+
+  if (isNew) {
+    return (
+      <CatalogSheet
+        title="Новая тренировка"
+        multi={{ confirmLabel: 'Создать тренировку', onConfirm: createDay }}
+        onClose={onBack}
+      />
+    )
   }
 
   const confirmDeleteDay = () => {
@@ -231,12 +253,10 @@ export function DayEdit({ dayOrderIndex, onBack }: { dayOrderIndex: number; onBa
           )
         })}
         <SecondaryButton onClick={() => setAddOpen(true)}>+ Добавить упражнение</SecondaryButton>
-        {!isNew && (
-          <button onClick={() => setConfirmDelete(true)}
-            className="w-full py-2 text-[13px] font-semibold text-heavy">
-            Удалить тренировку
-          </button>
-        )}
+        <button onClick={() => setConfirmDelete(true)}
+          className="w-full py-2 text-[13px] font-semibold text-heavy">
+          Удалить тренировку
+        </button>
       </div>
       <div className="px-4 py-3 border-t border-elevated">
         <PrimaryButton onClick={onBack}>Готово</PrimaryButton>
