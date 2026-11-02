@@ -47,6 +47,8 @@ export interface WorkoutPlan {
   customWeekTypes: WeekLoadType[]
   customWeekPercents: number[]
   currentWeekIndex: number
+  /** Когда началась текущая неделя цикла (ISO); тренировки раньше этого момента в неё не засчитываются */
+  weekStartedAt?: string
   days: WorkoutDay[]
 }
 

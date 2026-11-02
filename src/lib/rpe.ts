@@ -1,7 +1,7 @@
 // MARK: - Обратная связь по RPE (порт WorkoutViewModel.applyRPEFeedback)
 // и переход недели цикла (advanceWeekIfFinished).
 import type { DayExercise, WorkoutDay, WorkoutPlan, WorkoutSession } from '../types'
-import { cycle } from './periodization'
+import { cycle, sessionsThisCycleWeek } from './periodization'
 
 export interface RPEFeedback {
   messages: string[]
@@ -59,11 +59,7 @@ export function applyRPEFeedback(
   }
 
   // Средний RPE текущей недели
-  const planName = plan.name
-  const weekIndex = plan.currentWeekIndex
-  const weekSessions = sessions.filter(
-    (s) => s.planName === planName && s.weekIndex === weekIndex && s.isCompleted && s.rpe != null,
-  )
+  const weekSessions = sessionsThisCycleWeek(plan, sessions).filter((s) => s.rpe != null)
   if (weekSessions.length >= 2) {
     const average = weekSessions.reduce((sum, s) => sum + (s.rpe ?? 0), 0) / weekSessions.length
     if (average >= 8.5) {
@@ -80,14 +76,9 @@ export function applyRPEFeedback(
 export function advanceWeekIfFinished(plan: WorkoutPlan, sessions: WorkoutSession[]): number | null {
   const weeks = cycle(plan.scheme, plan.customWeekTypes, plan.customWeekPercents)
   if (weeks.length === 0 || plan.days.length === 0) return null
-  const current = plan.currentWeekIndex
-  const done = new Set(
-    sessions
-      .filter((s) => s.planName === plan.name && s.weekIndex === current && s.isCompleted)
-      .map((s) => s.dayName),
-  )
+  const done = new Set(sessionsThisCycleWeek(plan, sessions).map((s) => s.dayName))
   if (plan.days.every((d) => done.has(d.name))) {
-    return current + 1
+    return (plan.currentWeekIndex + 1) % weeks.length
   }
   return null
 }

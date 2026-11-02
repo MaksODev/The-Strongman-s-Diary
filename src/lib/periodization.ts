@@ -1,5 +1,5 @@
 // MARK: - Движок периодизации (порт PeriodizationEngine.swift)
-import type { PeriodizationScheme, WeekLoadType, WorkoutPlan } from '../types'
+import type { PeriodizationScheme, WeekLoadType, WorkoutPlan, WorkoutSession } from '../types'
 
 export interface WeekInfo {
   index: number
@@ -39,4 +39,27 @@ export function currentWeek(plan: WorkoutPlan): WeekInfo | null {
 export function adjustedWeight(base: number, percent: number): number {
   if (base <= 0) return 0
   return Math.round(base * percent * 2) / 2
+}
+
+/// Номер текущей недели внутри цикла (с 1).
+export function currentWeekNumber(plan: WorkoutPlan): number {
+  const len = cycle(plan.scheme, plan.customWeekTypes, plan.customWeekPercents).length
+  return len > 0 ? (plan.currentWeekIndex % len) + 1 : 1
+}
+
+/// Переключение недели цикла: индекс всегда в пределах цикла, отсчёт «выполненных» дней начинается заново.
+export function withWeek(plan: WorkoutPlan, index: number): WorkoutPlan {
+  const len = cycle(plan.scheme, plan.customWeekTypes, plan.customWeekPercents).length
+  return { ...plan, currentWeekIndex: len > 0 ? ((index % len) + len) % len : 0, weekStartedAt: new Date().toISOString() }
+}
+
+/// Завершённые тренировки текущей недели цикла (не календарной).
+export function sessionsThisCycleWeek(plan: WorkoutPlan, sessions: WorkoutSession[]): WorkoutSession[] {
+  const len = cycle(plan.scheme, plan.customWeekTypes, plan.customWeekPercents).length || 1
+  const since = plan.weekStartedAt ? new Date(plan.weekStartedAt).getTime() : null
+  return sessions.filter((s) => {
+    if (!s.isCompleted || s.planName !== plan.name) return false
+    if (since === null) return s.weekIndex === plan.currentWeekIndex // планы без метки: прежнее поведение
+    return s.weekIndex % len === plan.currentWeekIndex % len && new Date(s.finishedAt ?? s.startedAt).getTime() >= since
+  })
 }

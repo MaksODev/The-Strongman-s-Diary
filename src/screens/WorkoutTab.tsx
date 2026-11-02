@@ -1,11 +1,11 @@
 // MARK: - Главный таб «Тренировка»: серия, неделя цикла, дни программы (старт и правка карандашом).
 import { useMemo, useRef, useState } from 'react'
 import { useApp } from '../state/store'
-import { currentWeek, cycle } from '../lib/periodization'
+import { currentWeek, currentWeekNumber, cycle, sessionsThisCycleWeek, withWeek } from '../lib/periodization'
 import { evaluateStreak, WEEKS_TO_EARN } from '../lib/streakFreeze'
 import {
   completedThisWeek, consistencyNudge, dismissForThisWeek, isDismissedThisWeek,
-  NUDGE_DISMISS_KEY, OVERLOAD_DISMISS_KEY, overloadStatus, sessionsInWeek,
+  NUDGE_DISMISS_KEY, OVERLOAD_DISMISS_KEY, overloadStatus,
 } from '../lib/nudges'
 import { CONSISTENCY_FACTS, RECOVERY_FACTS } from '../lib/catalog'
 import type { WorkoutDay } from '../types'
@@ -29,8 +29,12 @@ export function WorkoutTab({ onStartDay, onEditDay }: {
 
   const week = plan ? currentWeek(plan) : null
   const weeks = plan ? cycle(plan.scheme, plan.customWeekTypes, plan.customWeekPercents) : []
-  const doneThisWeek = useMemo(() => new Set(sessionsInWeek(sessions, 0).map((s) => s.dayName)), [sessions])
-  const doneCount = doneThisWeek.size
+  // «Выполнено» считается по неделе цикла, а не по календарю: после перехода недели все дни снова доступны
+  const doneThisWeek = useMemo(
+    () => new Set(plan ? sessionsThisCycleWeek(plan, sessions).map((s) => s.dayName) : []),
+    [plan, sessions],
+  )
+  const doneCount = plan ? plan.days.filter((d) => doneThisWeek.has(d.name)).length : 0
 
   const overload = profile ? overloadStatus(completedThisWeek(sessions), profile.sessionsPerWeek) : 'ok'
   const overloadDismissed = isDismissedThisWeek(OVERLOAD_DISMISS_KEY)
@@ -126,18 +130,18 @@ export function WorkoutTab({ onStartDay, onEditDay }: {
           <Card className="p-4">
             <div className="flex items-center justify-between gap-3">
               <button
-                onClick={() => updatePlan({ ...plan, currentWeekIndex: (plan.currentWeekIndex - 1 + weeks.length) % weeks.length })}
+                onClick={() => updatePlan(withWeek(plan, plan.currentWeekIndex - 1))}
                 aria-label="предыдущая неделя"
                 className="w-9 h-9 rounded-full bg-elevated border border-white/10 text-text-secondary text-[16px] font-bold active:text-ink shrink-0"
               >‹</button>
               <div className="flex-1 text-center">
-                <div className="text-[12px] text-text-secondary uppercase tracking-wide">Неделя {plan.currentWeekIndex + 1} цикла</div>
+                <div className="text-[12px] text-text-secondary uppercase tracking-wide">Неделя {currentWeekNumber(plan)} цикла</div>
                 <div className="font-bold text-[17px]" style={{ color: WEEK_TYPE_COLORS[week.type] }}>
                   {WEEK_TYPE_TITLES[week.type]} · {Math.round(week.percent * 100)}%
                 </div>
               </div>
               <button
-                onClick={() => updatePlan({ ...plan, currentWeekIndex: (plan.currentWeekIndex + 1) % weeks.length })}
+                onClick={() => updatePlan(withWeek(plan, plan.currentWeekIndex + 1))}
                 aria-label="следующая неделя"
                 className="w-9 h-9 rounded-full bg-elevated border border-white/10 text-text-secondary text-[16px] font-bold active:text-ink shrink-0"
               >›</button>
@@ -233,7 +237,7 @@ function DayCard({ day, done, onStart, onEdit, onDelete }: {
   const handleClick = () => {
     if (suppressClick.current) { suppressClick.current = false; return }
     if (open) { close(); return }
-    if (!done) onStart()
+    onStart()
   }
 
   return (
@@ -261,7 +265,7 @@ function DayCard({ day, done, onStart, onEdit, onDelete }: {
           transition: dragging ? 'none' : 'transform 0.22s ease',
         }}
       >
-        <Card className={`p-4 flex items-center gap-2.5 ${done ? 'opacity-60' : 'active:brightness-110'}`}>
+        <Card className={`p-4 flex items-center gap-2.5 ${done ? 'opacity-70' : ''} active:brightness-110`}>
           <div className="flex-1 min-w-0">
             <div className="font-semibold text-[15px] flex items-center gap-2">
               {done && <span className="text-accent">✓</span>}
@@ -278,15 +282,13 @@ function DayCard({ day, done, onStart, onEdit, onDelete }: {
           >
             <PencilIcon />
           </button>
-          {!done && (
-            <button
-              onClick={(e) => { e.stopPropagation(); onStart() }}
-              aria-label={`начать тренировку ${day.name}`}
-              className="btn-brutal btn-flash shrink-0 w-11 h-11 rounded-full flex items-center justify-center"
-            >
-              <PlayIcon className="translate-x-px" />
-            </button>
-          )}
+          <button
+            onClick={(e) => { e.stopPropagation(); onStart() }}
+            aria-label={`начать тренировку ${day.name}`}
+            className="btn-brutal btn-flash shrink-0 w-11 h-11 rounded-full flex items-center justify-center"
+          >
+            <PlayIcon className="translate-x-px" />
+          </button>
         </Card>
       </div>
     </div>

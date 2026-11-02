@@ -73,6 +73,7 @@ export default function App() {
       const advanced = advanceWeekIfFinished(newPlan, [...sessions, result.session])
       if (advanced !== null) {
         newPlan.currentWeekIndex = advanced
+        newPlan.weekStartedAt = new Date().toISOString()
         result.weekAdvanced = true
         result.weekNumber = advanced + 1
       }

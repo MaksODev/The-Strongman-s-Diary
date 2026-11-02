@@ -1,7 +1,7 @@
 // MARK: - Таб «Программа»: обзор плана, дни, редактирование упражнений дня.
 import { useState } from 'react'
 import { useApp } from '../state/store'
-import { adjustedWeight, currentWeek, cycle } from '../lib/periodization'
+import { adjustedWeight, currentWeek, currentWeekNumber, cycle, withWeek } from '../lib/periodization'
 import { exerciseById, exerciseImage } from '../lib/catalog'
 import type { DayExercise, WorkoutDay } from '../types'
 import { SCHEME_TITLES, WEEK_TYPE_COLORS, WEEK_TYPE_TITLES, formatWeight } from '../types'
@@ -30,7 +30,7 @@ export function ProgramTab({ onEditDay }: { onEditDay: (dayOrderIndex: number) =
               const isCurrent = week && w.index === weeks.indexOf(week)
               return (
                 <button key={w.index}
-                  onClick={() => updatePlan({ ...plan, currentWeekIndex: w.index })}
+                  onClick={() => updatePlan(withWeek(plan, w.index))}
                   title="Сделать текущей неделей"
                   className="flex-1 rounded-[10px] px-2 py-2 text-center transition-transform active:scale-95"
                   style={{
@@ -44,7 +44,7 @@ export function ProgramTab({ onEditDay }: { onEditDay: (dayOrderIndex: number) =
             })}
           </div>
           <div className="text-text-disabled text-[11px] mt-2">
-            Цикл повторяется · сейчас неделя {plan.currentWeekIndex + 1} · тапни неделю, чтобы переключить
+            Цикл повторяется · сейчас неделя {currentWeekNumber(plan)} · тапни неделю, чтобы переключить
           </div>
         </Card>
 
