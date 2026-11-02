@@ -175,7 +175,7 @@ export function EmptyState({ emoji, title, subtitle }: { emoji: string; title: s
 // MARK: - Модальное окно (нижний шит на телефоне)
 export function Modal({ children, onClose }: { children: ReactNode; onClose: () => void }) {
   return (
-    <div className="fixed inset-x-0 top-0 z-50 flex items-end sm:items-center justify-center px-3 pb-6" style={{ height: 'var(--app-h, 100%)' }}>
+    <div className="fixed inset-x-0 top-0 z-50 flex items-center justify-center p-3" style={{ height: 'var(--app-h, 100%)' }}>
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
       <div className="relative bg-card border border-white/10 rounded-[24px] w-full sm:max-w-md p-5 max-h-[85vh] overflow-y-auto">
         {children}

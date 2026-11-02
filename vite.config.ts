@@ -4,7 +4,6 @@ import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
-  define: { __BUILD__: JSON.stringify(new Date().toISOString().slice(5, 16)) },
   base: '/The-Strongman-s-Diary/',
   plugins: [
     react(),

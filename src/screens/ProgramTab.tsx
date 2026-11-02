@@ -208,7 +208,8 @@ export function DayEdit({ dayOrderIndex, onBack }: { dayOrderIndex: number; onBa
                 <button onClick={() => setPickerFor(day.exercises.indexOf(item))}
                   className="text-[12px] text-accent font-medium px-2 py-1">Заменить</button>
                 <button onClick={() => removeExercise(item.exerciseID)}
-                  className="text-text-disabled text-[18px] px-1">×</button>
+                  aria-label="удалить упражнение"
+                  className="shrink-0 w-7 h-7 flex items-center justify-center rounded-[10px] border border-white/20 bg-white/5 text-text-secondary text-[18px] leading-none active:scale-95 transition-transform">×</button>
               </div>
               {/* Параметры */}
               <div className="grid grid-cols-4 gap-2 mt-2.5">
