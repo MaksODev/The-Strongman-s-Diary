@@ -1,16 +1,18 @@
 // MARK: - Онбординг: сбор профиля атлета и генерация стартовой программы
-import { useState, type ReactElement } from 'react'
+import { useRef, useState, type ReactElement } from 'react'
 import type { Equipment, PeriodizationScheme, Profile, Sex, TrainingExperience, TrainingGoal as Goal, WeekLoadType } from '../types'
 import { useApp } from '../state/store'
 import { SEX_TITLES, EXPERIENCE_TITLES, GOAL_TITLES, EQUIPMENT_TITLES, SCHEME_TITLES, WEEK_TYPE_TITLES } from '../types'
 import { PrimaryButton, SecondaryButton, Card } from '../components/ui'
 import { RulerScale } from '../components/RulerScale'
+import { ChartIcon, DumbbellIcon, ProgramIcon } from '../components/icons'
 
 const TOTAL_STEPS = 9
 
 export function Onboarding({ onDone }: { onDone: () => void }) {
   const { completeOnboarding } = useApp()
   const [step, setStep] = useState(0)
+  const [intro, setIntro] = useState(0) // страницы-знакомство; INTRO.length — анкета
   const [profile, setProfile] = useState<Profile>({
     sex: 'male',
     age: 30,
@@ -173,6 +175,10 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
     profile.goals.length > 0 &&
     (profile.scheme !== 'custom' || (profile.customWeekTypes.length > 0 && profile.customWeekTypes.length === profile.customWeekPercents.length))
 
+  if (intro < INTRO.length) {
+    return <IntroSlides index={intro} onChange={setIntro} />
+  }
+
   return (
     <div className="h-full flex flex-col bg-bg safe-top safe-bottom">
       <div className="px-5 pt-4 pb-2">
@@ -194,6 +200,89 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
         ) : (
           <PrimaryButton disabled={!canNext} onClick={finish}>Сгенерировать программу</PrimaryButton>
         )}
+      </div>
+    </div>
+  )
+}
+
+// MARK: Знакомство с приложением (3 страницы перед анкетой)
+const INTRO: { icon: ReactElement; title: string; text: string; points: string[] }[] = [
+  {
+    icon: <ProgramIcon width={44} height={44} />,
+    title: 'Программа под тебя',
+    text: 'Ответь на несколько вопросов — приложение составит план: упражнения, подходы, повторения и примерные стартовые веса.',
+    points: ['Учитываем опыт, цели и оборудование', 'Тяжёлые и лёгкие недели чередуются сами', 'Вес растёт, когда ты готов, — без ручных расчётов'],
+  },
+  {
+    icon: <DumbbellIcon width={44} height={44} />,
+    title: 'Тренировка без лишнего',
+    text: 'Отмечай подходы одним касанием: вес выбирается линейкой, повторы — кнопками, а прошлый результат подставляется сам.',
+    points: ['Каталог из 390 упражнений с фото и техникой', 'Свои тренировки: добавляй упражнения галочками', 'Оценка тяжести и итоги с тоннажем'],
+  },
+  {
+    icon: <ChartIcon width={44} height={44} />,
+    title: 'Прогресс и мотивация',
+    text: 'Рекорды, графики и серия недель подряд показывают, что ты действительно растёшь.',
+    points: ['Рекорды и вехи по тоннажу', 'Страховка серии: один пропуск не обнуляет её', 'Работает офлайн, данные — только на твоём телефоне'],
+  },
+]
+
+function IntroSlides({ index, onChange }: { index: number; onChange: (i: number) => void }) {
+  const last = index === INTRO.length - 1
+  const startX = useRef<number | null>(null)
+  const go = (i: number) => onChange(Math.max(0, Math.min(INTRO.length, i)))
+
+  return (
+    <div
+      className="h-full flex flex-col bg-bg safe-top safe-bottom touch-pan-y"
+      onPointerDown={(e) => { startX.current = e.clientX }}
+      onPointerUp={(e) => {
+        if (startX.current === null) return
+        const dx = e.clientX - startX.current
+        startX.current = null
+        if (dx < -60) go(index + 1)
+        else if (dx > 60 && index > 0) go(index - 1)
+      }}
+    >
+      <div className="px-5 pt-4 flex justify-end h-10">
+        {!last && (
+          <button className="text-text-secondary text-[14px] font-semibold" onClick={() => go(INTRO.length)}>Пропустить</button>
+        )}
+      </div>
+
+      <div className="flex-1 overflow-hidden">
+        <div className="h-full flex transition-transform duration-300 ease-out" style={{ transform: `translateX(-${index * 100}%)` }}>
+          {INTRO.map((slide, i) => (
+            <section key={i} className="w-full shrink-0 h-full overflow-y-auto px-6 flex flex-col items-center text-center pt-6" aria-hidden={i !== index}>
+              <div className="tile-violet text-white w-[104px] h-[104px] rounded-[30px] flex items-center justify-center animate-float">
+                {slide.icon}
+              </div>
+              <h1 className="font-display text-[26px] font-bold mt-8">{slide.title}</h1>
+              <p className="text-text-secondary text-[15px] leading-relaxed mt-3 max-w-[320px]">{slide.text}</p>
+              <ul className="mt-6 w-full max-w-[340px] space-y-2 text-left">
+                {slide.points.map((p) => (
+                  <li key={p} className="tile-glass rounded-[16px] px-4 py-3 flex items-center gap-3 text-[14px] font-semibold">
+                    <span className="shrink-0 w-6 h-6 rounded-full bg-accent/20 text-accent flex items-center justify-center">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 7" /></svg>
+                    </span>
+                    {p}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex justify-center gap-2 py-3">
+        {INTRO.map((_, i) => (
+          <span key={i} className="h-2 rounded-full transition-all"
+            style={{ width: i === index ? 22 : 8, background: i === index ? 'linear-gradient(90deg, #a855f7, #6d3df0)' : 'rgba(255,255,255,0.15)' }} />
+        ))}
+      </div>
+      <div className="px-5 pb-4 flex gap-3">
+        {index > 0 && <SecondaryButton className="!w-auto px-6" onClick={() => go(index - 1)}>Назад</SecondaryButton>}
+        <PrimaryButton onClick={() => go(index + 1)}>{last ? 'Начать' : 'Далее'}</PrimaryButton>
       </div>
     </div>
   )
