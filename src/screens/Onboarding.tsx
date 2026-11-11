@@ -159,6 +159,10 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
             </button>
           ))}
           {profile.scheme === 'custom' && <CustomSchemeEditor profile={profile} patch={patch} />}
+          <p className="text-text-disabled text-[12px] pt-2">
+            Подходы и повторения подберём по опыту, а стартовые веса — по массе тела и снаряду. Веса примерные:
+            первые тренировки идут с запасом 2–3 повторения, поправь их, если слишком легко или тяжело.
+          </p>
         </div>
       ),
     },
