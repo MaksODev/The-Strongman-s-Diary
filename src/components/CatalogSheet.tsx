@@ -43,7 +43,7 @@ export function CatalogSheet({ title = 'Каталог упражнений', ex
     <div className="fixed inset-x-0 top-0 bg-bg z-40 flex flex-col safe-top safe-bottom" style={{ height: 'var(--app-h, 100%)' }}>
       {/* Шапка */}
       <div className="px-4 pt-4 pb-2 flex items-center gap-3">
-        <h2 className="font-display font-bold text-[19px] flex-1">{title}</h2>
+        <h2 className="font-display font-medium text-[20px] flex-1">{title}</h2>
         <button onClick={onClose} aria-label="закрыть каталог"
           className="w-9 h-9 rounded-full bg-elevated border border-white/10 text-text-secondary text-[18px] flex items-center justify-center">
           ×
@@ -98,8 +98,8 @@ export function CatalogSheet({ title = 'Каталог упражнений', ex
                 <button
                   onClick={() => toggle(e.id)}
                   aria-label={`убрать ${e.name}`}
-                  className="btn-brutal absolute top-2 right-2 w-8 h-8 rounded-full bg-[#22c55e] text-white flex items-center justify-center"
-                  style={{ boxShadow: '0 6px 16px rgba(34,197,94,0.4)' }}
+                  className="btn-brutal absolute top-2 right-2 w-8 h-8 rounded-full bg-[#4ecb8d] text-[#0a0a0a] flex items-center justify-center"
+                  style={{ boxShadow: '0 6px 16px rgba(78,203,141,0.35)' }}
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 7" /></svg>
                 </button>
@@ -142,7 +142,7 @@ function ExerciseCard({ exercise, onClick }: { exercise: Exercise; onClick: () =
   const img = exerciseImage(exercise.id)
   return (
     <button onClick={onClick} className="w-full text-left">
-      <div className="tile-glass rounded-[16px] overflow-hidden active:ring-1 ring-accent h-full">
+      <div className="tile-glass rounded-[24px] overflow-hidden active:ring-1 ring-accent h-full">
         {img && (
           <img src={img} alt={exercise.name} loading="lazy"
             className="w-full aspect-[3/2] object-cover bg-elevated" />

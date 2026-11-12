@@ -50,7 +50,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
         <div className="grid grid-cols-2 gap-3">
           {(Object.keys(SEX_TITLES) as Sex[]).map((s) => (
             <button key={s} onClick={() => patch({ sex: s })}
-              className={`btn-brutal py-5 rounded-[16px] font-black text-[16px] border-2 border-ink shadow-brutal-sm ${profile.sex === s ? 'bg-accent text-ink' : 'bg-card text-ink'}`}>
+              className={`btn-brutal py-5 rounded-[16px] font-black text-[16px] border-2 border-ink shadow-brutal-sm ${profile.sex === s ? 'bg-accent text-black' : 'bg-card text-ink'}`}>
               {SEX_TITLES[s]}
             </button>
           ))}
@@ -85,7 +85,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
         <div className="space-y-2">
           {(Object.keys(EXPERIENCE_TITLES) as TrainingExperience[]).map((e) => (
             <button key={e} onClick={() => patch({ experience: e })}
-              className={`btn-brutal w-full py-4 px-4 rounded-[16px] text-left font-extrabold text-[15px] border-2 border-ink shadow-brutal-sm ${profile.experience === e ? 'bg-accent text-ink' : 'bg-card text-ink'}`}>
+              className={`btn-brutal w-full py-4 px-4 rounded-[16px] text-left font-extrabold text-[15px] border-2 border-ink shadow-brutal-sm ${profile.experience === e ? 'bg-accent text-black' : 'bg-card text-ink'}`}>
               {EXPERIENCE_TITLES[e]}
             </button>
           ))}
@@ -100,7 +100,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
             const active = profile.equipment.includes(eq)
             return (
               <button key={eq} onClick={() => patch({ equipment: toggleIn(profile.equipment, eq) })}
-                className={`btn-brutal py-4 px-3 rounded-[16px] font-extrabold text-[14px] border-2 border-ink shadow-brutal-sm ${active ? 'bg-accent text-ink' : 'bg-card text-ink'}`}>
+                className={`btn-brutal py-4 px-3 rounded-[16px] font-extrabold text-[14px] border-2 border-ink shadow-brutal-sm ${active ? 'bg-accent text-black' : 'bg-card text-ink'}`}>
                 {EQUIPMENT_TITLES[eq]}
               </button>
             )
@@ -116,7 +116,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
             const active = profile.goals.includes(g)
             return (
               <button key={g} onClick={() => patch({ goals: toggleIn(profile.goals, g) })}
-                className={`btn-brutal py-4 px-3 rounded-[16px] font-extrabold text-[14px] border-2 border-ink shadow-brutal-sm ${active ? 'bg-accent text-ink' : 'bg-card text-ink'}`}>
+                className={`btn-brutal py-4 px-3 rounded-[16px] font-extrabold text-[14px] border-2 border-ink shadow-brutal-sm ${active ? 'bg-accent text-black' : 'bg-card text-ink'}`}>
                 {GOAL_TITLES[g]}
               </button>
             )
@@ -130,7 +130,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
         <div className="grid grid-cols-2 gap-3">
           {[30, 45, 60, 90].map((m) => (
             <button key={m} onClick={() => patch({ sessionMinutes: m })}
-              className={`btn-brutal py-5 rounded-[16px] font-black text-[16px] border-2 border-ink shadow-brutal-sm ${profile.sessionMinutes === m ? 'bg-accent text-ink' : 'bg-card text-ink'}`}>
+              className={`btn-brutal py-5 rounded-[16px] font-black text-[16px] border-2 border-ink shadow-brutal-sm ${profile.sessionMinutes === m ? 'bg-accent text-black' : 'bg-card text-ink'}`}>
               {m} мин
             </button>
           ))}
@@ -143,7 +143,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
         <div className="grid grid-cols-5 gap-2">
           {[2, 3, 4, 5, 6].map((n) => (
             <button key={n} onClick={() => patch({ sessionsPerWeek: n })}
-              className={`btn-brutal py-5 rounded-[16px] font-display font-bold text-[18px] border-2 border-ink shadow-brutal-sm ${profile.sessionsPerWeek === n ? 'bg-accent text-ink' : 'bg-card text-ink'}`}>
+              className={`btn-brutal py-5 rounded-[16px] font-display font-bold text-[18px] border-2 border-ink shadow-brutal-sm ${profile.sessionsPerWeek === n ? 'bg-accent text-black' : 'bg-card text-ink'}`}>
               {n}
             </button>
           ))}
@@ -184,13 +184,12 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
       <div className="px-5 pt-4 pb-2">
         <div className="flex gap-1.5">
           {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
-            <div key={i} className="flex-1 h-2.5 rounded-full border border-white/10"
-              style={{ background: i <= step ? 'linear-gradient(90deg, #a855f7, #6d3df0)' : 'rgba(255,255,255,0.06)' }} />
+            <div key={i} className={`flex-1 h-2.5 rounded-full border border-white/10 ${i <= step ? 'bg-accent' : 'hatch'}`} />
           ))}
         </div>
       </div>
       <div className="flex-1 overflow-y-auto px-5 py-6">
-        <h1 className="font-display text-[24px] font-bold mb-6">{steps[step].title}</h1>
+        <h1 className="font-display text-[26px] font-medium mb-6">{steps[step].title}</h1>
         {steps[step].render()}
       </div>
       <div className="px-5 py-4 flex gap-3">
@@ -254,14 +253,14 @@ function IntroSlides({ index, onChange }: { index: number; onChange: (i: number)
         <div className="h-full flex transition-transform duration-300 ease-out" style={{ transform: `translateX(-${index * 100}%)` }}>
           {INTRO.map((slide, i) => (
             <section key={i} className="w-full shrink-0 h-full overflow-y-auto px-6 flex flex-col items-center text-center pt-6" aria-hidden={i !== index}>
-              <div className="tile-violet text-white w-[104px] h-[104px] rounded-[30px] flex items-center justify-center animate-float">
+              <div className="tile-violet w-[104px] h-[104px] rounded-full flex items-center justify-center animate-float">
                 {slide.icon}
               </div>
-              <h1 className="font-display text-[26px] font-bold mt-8">{slide.title}</h1>
+              <h1 className="font-display text-[28px] font-medium mt-8">{slide.title}</h1>
               <p className="text-text-secondary text-[15px] leading-relaxed mt-3 max-w-[320px]">{slide.text}</p>
               <ul className="mt-6 w-full max-w-[340px] space-y-2 text-left">
                 {slide.points.map((p) => (
-                  <li key={p} className="tile-glass rounded-[16px] px-4 py-3 flex items-center gap-3 text-[14px] font-semibold">
+                  <li key={p} className="tile-glass rounded-[22px] px-4 py-3 flex items-center gap-3 text-[14px] font-semibold">
                     <span className="shrink-0 w-6 h-6 rounded-full bg-accent/20 text-accent flex items-center justify-center">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 7" /></svg>
                     </span>
@@ -277,7 +276,7 @@ function IntroSlides({ index, onChange }: { index: number; onChange: (i: number)
       <div className="flex justify-center gap-2 py-3">
         {INTRO.map((_, i) => (
           <span key={i} className="h-2 rounded-full transition-all"
-            style={{ width: i === index ? 22 : 8, background: i === index ? 'linear-gradient(90deg, #a855f7, #6d3df0)' : 'rgba(255,255,255,0.15)' }} />
+            style={{ width: i === index ? 22 : 8, background: i === index ? '#ffd02a' : 'rgba(255,255,255,0.15)' }} />
         ))}
       </div>
       <div className="px-5 pb-4 flex gap-3">

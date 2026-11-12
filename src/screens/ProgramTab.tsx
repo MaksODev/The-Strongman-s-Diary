@@ -27,7 +27,7 @@ export function ProgramTab({ onEditDay }: { onEditDay: (dayOrderIndex: number) =
           {/* Цикл: тап по неделе делает её текущей */}
           <div className="flex gap-1.5 mt-3">
             {weeks.map((w) => {
-              const isCurrent = week && w.index === weeks.indexOf(week)
+              const isCurrent = week && w.index === week.index
               return (
                 <button key={w.index}
                   onClick={() => updatePlan(withWeek(plan, w.index))}
@@ -35,7 +35,7 @@ export function ProgramTab({ onEditDay }: { onEditDay: (dayOrderIndex: number) =
                   className="flex-1 rounded-[10px] px-2 py-2 text-center transition-transform active:scale-95"
                   style={{
                     backgroundColor: isCurrent ? WEEK_TYPE_COLORS[w.type] : 'rgba(255,255,255,0.05)',
-                    color: isCurrent ? '#0a0a0e' : '#9b9ba8',
+                    color: isCurrent ? '#0a0a0a' : '#8f8f94',
                   }}>
                   <div className="text-[10px] font-semibold uppercase">{WEEK_TYPE_TITLES[w.type]}</div>
                   <div className="text-[11px] font-bold">{Math.round(w.percent * 100)}%</div>

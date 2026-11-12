@@ -169,10 +169,10 @@ export const DIFFICULTY_TITLES: Record<Difficulty, string> = {
 
 // Цвета типов недель (тёмная тема)
 export const WEEK_TYPE_COLORS: Record<WeekLoadType, string> = {
-  heavy: '#ff7a5c',
-  rampUp: '#ffd400',
-  light: '#34d399',
-  deload: '#6e8bff',
+  heavy: '#f2441c',
+  rampUp: '#ffd02a',
+  light: '#ffffff',
+  deload: '#4ecb8d',
 }
 
 export function formatWeight(v: number): string {

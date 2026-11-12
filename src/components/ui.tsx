@@ -3,7 +3,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 
 export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <div className={`tile-glass rounded-[22px] ${className}`}>{children}</div>
+    <div className={`tile-glass rounded-[28px] ${className}`}>{children}</div>
   )
 }
 
@@ -17,7 +17,7 @@ export function PrimaryButton({ children, onClick, disabled, className = '' }: {
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`btn-brutal w-full py-3.5 px-4 rounded-[18px] font-extrabold text-[15px] btn-flash disabled:opacity-40 disabled:pointer-events-none ${className}`}
+      className={`btn-brutal w-full py-3.5 px-4 rounded-full font-bold text-[15px] btn-flash disabled:opacity-40 disabled:pointer-events-none ${className}`}
     >
       {children}
     </button>
@@ -32,7 +32,7 @@ export function SecondaryButton({ children, onClick, className = '' }: {
   return (
     <button
       onClick={onClick}
-      className={`btn-brutal w-full py-3 px-4 rounded-[18px] font-bold text-[15px] bg-elevated text-ink border border-white/10 shadow-brutal-sm ${className}`}
+      className={`btn-brutal w-full py-3 px-4 rounded-full font-semibold text-[15px] bg-elevated text-ink border border-white/10 ${className}`}
     >
       {children}
     </button>
@@ -49,10 +49,10 @@ export function Chip({ children, active, onClick, color }: {
     <button
       onClick={onClick}
       className={`btn-brutal px-3.5 py-2 rounded-[999px] text-[13px] font-bold whitespace-nowrap border ${
-        active ? 'border-transparent text-white' : 'bg-elevated text-text-secondary border-white/10'
+        active ? 'border-transparent text-[#0a0a0a]' : 'bg-elevated text-text-secondary border-white/10'
       }`}
       style={active
-        ? { background: color ?? 'linear-gradient(140deg, #a855f7 0%, #6d3df0 100%)', boxShadow: '0 6px 18px rgba(139,92,246,0.35)' }
+        ? { background: color ?? '#ffd02a' }
         : undefined}
     >
       {children}
@@ -177,7 +177,7 @@ export function Modal({ children, onClose }: { children: ReactNode; onClose: () 
   return (
     <div className="fixed inset-x-0 top-0 z-50 flex items-center justify-center p-3" style={{ height: 'var(--app-h, 100%)' }}>
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
-      <div className="relative bg-card border border-white/10 rounded-[24px] w-full sm:max-w-md p-5 max-h-[85vh] overflow-y-auto">
+      <div className="relative bg-card border border-white/10 rounded-[32px] w-full sm:max-w-md p-5 max-h-[85vh] overflow-y-auto">
         {children}
       </div>
     </div>

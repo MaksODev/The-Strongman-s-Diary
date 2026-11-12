@@ -485,7 +485,7 @@ function SetRow({ setIndex, log, repsRange, lastSet, onChange }: {
           className={`w-8 h-8 rounded-[10px] border flex items-center justify-center shrink-0 transition-colors
             ${effective.isCompleted ? 'bg-accent border-transparent' : 'bg-elevated border-white/15'}`}
         >
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.2"
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" strokeWidth="3.2"
             strokeLinecap="round" strokeLinejoin="round"
             style={{ opacity: effective.isCompleted ? 1 : 0, transition: 'opacity 0.15s ease' }}>
             <path d="M4.5 12.5l5 5 10-11" />

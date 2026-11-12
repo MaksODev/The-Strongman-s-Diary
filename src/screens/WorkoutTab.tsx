@@ -53,11 +53,11 @@ export function WorkoutTab({ onStartDay, onEditDay }: {
         <Card className="p-4">
           <div className="flex items-center gap-4">
             {/* Иллюстрация: плитка со смыслом серии/страховки */}
-            <div className={`w-[64px] h-[64px] rounded-[18px] flex items-center justify-center shrink-0 transition-all ${
+            <div className={`w-[64px] h-[64px] rounded-full flex items-center justify-center shrink-0 transition-all ${
               streak?.freezeAvailable
-                ? 'tile-indigo text-white'
+                ? 'tile-indigo'
                 : streak && streak.effectiveStreak > 0
-                  ? 'tile-violet text-white'
+                  ? 'tile-violet'
                   : 'bg-elevated border border-white/10 text-text-secondary'
             }`}>
               {streak?.freezeAvailable
@@ -67,7 +67,7 @@ export function WorkoutTab({ onStartDay, onEditDay }: {
                   : <SproutIcon />}
             </div>
             <div className="flex-1">
-              <div className="font-display font-bold text-[18px]">
+              <div className="font-display font-medium text-[18px] leading-snug">
                 {streak && streak.effectiveStreak > 0
                   ? `Серия: ${streak.effectiveStreak} ${plural(streak.effectiveStreak, 'неделя', 'недели', 'недель')}`
                   : 'Серия начнётся с первой тренировки'}
@@ -78,7 +78,7 @@ export function WorkoutTab({ onStartDay, onEditDay }: {
                   : `Заряд страховки: ${streak?.chargeWeeks ?? 0}/${WEEKS_TO_EARN} недель подряд`}
               </div>
               {/* Прогресс-бар заряда: иконка заливается цветом */}
-              <div className="mt-2 h-2.5 rounded-full bg-elevated border border-white/5 overflow-hidden">
+              <div className="mt-2.5 h-3 rounded-full hatch border border-white/5 overflow-hidden">
                 <div
                   className="h-full rounded-full bg-accent animate-charge"
                   style={{ ['--charge' as string]: `${((streak?.freezeAvailable ? WEEKS_TO_EARN : streak?.chargeWeeks ?? 0) / WEEKS_TO_EARN) * 100}%` }}
@@ -125,32 +125,46 @@ export function WorkoutTab({ onStartDay, onEditDay }: {
           </Card>
         )}
 
-        {/* Текущая неделя цикла: можно переключать вручную */}
+        {/* Текущая неделя цикла: столбцы со штриховкой, тап по столбцу делает неделю текущей */}
         {week && (
           <Card className="p-4">
-            <div className="flex items-center justify-between gap-3">
-              <button
-                onClick={() => updatePlan(withWeek(plan, plan.currentWeekIndex - 1))}
-                aria-label="предыдущая неделя"
-                className="w-9 h-9 rounded-full bg-elevated border border-white/10 text-text-secondary text-[16px] font-bold active:text-ink shrink-0"
-              >‹</button>
-              <div className="flex-1 text-center">
-                <div className="text-[12px] text-text-secondary uppercase tracking-wide">Неделя {currentWeekNumber(plan)} цикла</div>
-                <div className="font-bold text-[17px]" style={{ color: WEEK_TYPE_COLORS[week.type] }}>
-                  {WEEK_TYPE_TITLES[week.type]} · {Math.round(week.percent * 100)}%
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <div className="text-[13px] text-text-secondary">Неделя {currentWeekNumber(plan)} цикла</div>
+                <div className="font-display font-light text-[30px] leading-tight mt-1" style={{ color: WEEK_TYPE_COLORS[week.type] }}>
+                  {WEEK_TYPE_TITLES[week.type]}
                 </div>
               </div>
-              <button
-                onClick={() => updatePlan(withWeek(plan, plan.currentWeekIndex + 1))}
-                aria-label="следующая неделя"
-                className="w-9 h-9 rounded-full bg-elevated border border-white/10 text-text-secondary text-[16px] font-bold active:text-ink shrink-0"
-              >›</button>
+              <div className="flex gap-2 shrink-0">
+                <button
+                  onClick={() => updatePlan(withWeek(plan, plan.currentWeekIndex - 1))}
+                  aria-label="предыдущая неделя"
+                  className="w-10 h-10 rounded-full bg-elevated border border-white/10 text-text-secondary text-[18px] active:text-ink"
+                >‹</button>
+                <button
+                  onClick={() => updatePlan(withWeek(plan, plan.currentWeekIndex + 1))}
+                  aria-label="следующая неделя"
+                  className="w-10 h-10 rounded-full bg-elevated border border-white/10 text-text-secondary text-[18px] active:text-ink"
+                >›</button>
+              </div>
             </div>
-            <div className="flex justify-center gap-1 mt-3">
-              {weeks.map((w) => (
-                <div key={w.index} className="w-2 h-6 rounded-full"
-                  style={{ backgroundColor: w.index === weeks.indexOf(week) ? WEEK_TYPE_COLORS[w.type] : 'rgba(255,255,255,0.08)' }} />
-              ))}
+            <div className="flex gap-2 mt-4">
+              {weeks.map((w) => {
+                const current = w.index === week.index
+                return (
+                  <button key={w.index} onClick={() => updatePlan(withWeek(plan, w.index))}
+                    aria-label={`неделя ${w.index + 1}: ${WEEK_TYPE_TITLES[w.type]}`}
+                    className="flex-1 min-w-0 text-left">
+                    <div className="hatch rounded-[20px] h-24 overflow-hidden flex items-end">
+                      <div className="w-full rounded-[20px] p-2.5"
+                        style={{ height: `${Math.min(100, Math.round(w.percent * 100))}%`, background: current ? WEEK_TYPE_COLORS[w.type] : `color-mix(in srgb, ${WEEK_TYPE_COLORS[w.type]} 30%, transparent)` }}>
+                        <span className={`text-[13px] font-medium ${current ? 'text-[#0a0a0a]' : 'text-ink'}`}>{Math.round(w.percent * 100)}%</span>
+                      </div>
+                    </div>
+                    <div className={`text-[11px] mt-1.5 truncate ${current ? 'text-ink' : 'text-text-secondary'}`}>{WEEK_TYPE_TITLES[w.type]}</div>
+                  </button>
+                )
+              })}
             </div>
           </Card>
         )}
@@ -241,7 +255,7 @@ function DayCard({ day, done, onStart, onEdit, onDelete }: {
   }
 
   return (
-    <div className="relative rounded-[22px] overflow-hidden">
+    <div className="relative rounded-[28px] overflow-hidden">
       {/* Красная зона удаления: ширина равна открытому участку */}
       <button
         onClick={() => { close(); onDelete() }}

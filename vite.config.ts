@@ -20,8 +20,8 @@ export default defineConfig({
         scope: '/The-Strongman-s-Diary/',
         display: 'standalone',
         orientation: 'portrait',
-        background_color: '#0a0a0e',
-        theme_color: '#0a0a0e',
+        background_color: '#050505',
+        theme_color: '#050505',
         icons: [
           { src: 'pwa-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'pwa-512.png', sizes: '512x512', type: 'image/png' },

@@ -1,3 +1,4 @@
+@import '@fontsource/manrope/300.css';
 @import '@fontsource/manrope/400.css';
 @import '@fontsource/manrope/500.css';
 @import '@fontsource/manrope/600.css';
@@ -7,39 +8,41 @@
 @import "tailwindcss";
 
 @theme {
-  /* Палитра: тёмный «премиальный дашборд» (по референсу) */
-  --color-bg: #0a0a0e;          /* глубокий чёрный с синевой */
-  --color-card: #15151c;         /* тёмная плитка */
-  --color-elevated: #1e1e28;     /* приподнятая плитка */
-  --color-accent: #8b5cf6;       /* фиолетовый */
-  --color-accent-deep: #5b3df0;  /* глубокий индиго */
-  --color-flash: #ffd400;        /* жёлтая вспышка */
-  --color-ink: #f4f4f6;          /* почти белый (текст) */
-  --color-text-primary: #f4f4f6;
-  --color-text-secondary: #9b9ba8;
-  --color-text-disabled: #55555f;
+  /* Палитра по референсу: чистый чёрный, графитовые карточки, яркие сплошные акценты */
+  --color-bg: #050505;
+  --color-card: #0e0e0f;         /* карточка */
+  --color-elevated: #1a1a1c;     /* приподнятый элемент */
+  --color-raised: #28282b;       /* светлая «серая» карточка */
+  --color-accent: #ffd02a;       /* жёлтый — главный акцент */
+  --color-accent-deep: #f2a900;
+  --color-flash: #f2441c;        /* оранжево-красный */
+  --color-ink: #f5f5f5;
+  --color-text-primary: #f5f5f5;
+  --color-text-secondary: #8f8f94;
+  --color-text-disabled: #55555a;
 
   /* Индикация периодизации */
-  --color-heavy: #ff7a5c;        /* коралловый */
-  --color-ramp: #ffd400;         /* солнечный */
-  --color-light-week: #34d399;   /* мятный */
-  --color-deload: #6e8bff;       /* небесный */
+  --color-heavy: #f2441c;
+  --color-ramp: #ffd02a;
+  --color-light-week: #ffffff;
+  --color-deload: #4ecb8d;
 
-  --color-coral: #ff7a5c;
-  --color-sun: #ffd400;
-  --color-sky: #6e8bff;
+  --color-coral: #f2441c;
+  --color-sun: #ffd02a;
+  --color-sky: #4ecb8d;
+  --color-mint: #4ecb8d;
 
   --font-display: "Manrope", -apple-system, sans-serif;
   --font-body: "Manrope", -apple-system, sans-serif;
   --font-digits: "DotGothic16", "Manrope", monospace;
 
-  --radius-card: 22px;
+  --radius-card: 28px;
 }
 
 html, body, #root {
   height: var(--app-h, 100%);
-  background: #0a0a0e;
-  color: #f4f4f6;
+  background: #050505;
+  color: #f5f5f5;
   overscroll-behavior: none;
 }
 
@@ -47,10 +50,7 @@ html, body, #root {
 body {
   font-family: "Manrope", -apple-system, BlinkMacSystemFont, sans-serif;
   font-weight: 500;
-  background:
-    radial-gradient(120% 60% at 50% -10%, rgba(139, 92, 246, 0.14), transparent 60%),
-    #0a0a0e;
-  background-attachment: fixed;
+  background: #050505;
   -webkit-tap-highlight-color: transparent;
   -webkit-user-select: none;
   user-select: none;
@@ -63,9 +63,8 @@ input, textarea {
 
 /* MARK: - «Стеклянные» приёмы тёмной темы */
 /* Жёсткие бруталистские тени заменяем на мягкие глубокие */
-.shadow-brutal { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.05); }
-.shadow-brutal-sm { box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05); }
-.shadow-brutal-lg { box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06); }
+/* Плоский стиль: без теней, форму держат рамки и контраст */
+.shadow-brutal, .shadow-brutal-sm, .shadow-brutal-lg { box-shadow: none; }
 
 /* Нажатие: лёгкое сжатие вместо «вдавливания» тени */
 .btn-brutal { transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease; }
@@ -87,27 +86,34 @@ input, textarea {
 /* Пиксельные цифры в стиле референса */
 .font-digits { font-family: "DotGothic16", "Manrope", monospace; letter-spacing: 0.04em; }
 
-/* Фиолетовая градиентная плитка (как «Strain» на референсе) */
-.tile-violet {
-  background: linear-gradient(140deg, #a855f7 0%, #6d3df0 100%);
-  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+/* Плитки-иконки */
+.tile-violet {   /* жёлтая */
+  background: #ffd02a;
+  color: #0a0a0a;
 }
-/* Индиго-плитка (как «Sync») */
-.tile-indigo {
-  background: linear-gradient(140deg, #4c3aff 0%, #2b1fa8 100%);
-  box-shadow: 0 10px 30px rgba(76, 58, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+.tile-indigo {   /* белая */
+  background: #f5f5f5;
+  color: #0a0a0a;
 }
-/* Тёмная стеклянная плитка */
+/* Графитовая карточка: сплошная заливка + тонкая рамка */
 .tile-glass {
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  background: #0e0e0f;
+  border: 1px solid rgba(255, 255, 255, 0.07);
 }
-/* Основная акцентная кнопка: единый фиолетовый градиент во всём приложении */
+/* Светлая серая карточка (акцентный блок) */
+.tile-raised {
+  background: #28282b;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+/* Штриховка: «пустая» часть шкал и графиков */
+.hatch {
+  background-color: #131314;
+  background-image: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0 2px, transparent 2px 7px);
+}
+/* Основная кнопка: плоская жёлтая */
 .btn-flash {
-  background: linear-gradient(140deg, #a855f7 0%, #6d3df0 100%);
-  color: #ffffff;
-  box-shadow: 0 8px 22px rgba(139, 92, 246, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  background: #ffd02a;
+  color: #0a0a0a;
 }
 
 /* Анимация влёта ачивок и рекордов */

@@ -139,27 +139,26 @@ export default function App() {
         {app.draft && screen.name === 'tabs' && (
           <button
             onClick={() => setScreen({ name: 'workout' })}
-            className="btn-brutal w-full mb-2 py-3 rounded-[18px] btn-flash font-extrabold text-[14px] animate-pop-in"
+            className="btn-brutal w-full mb-2 py-3 rounded-full btn-flash font-bold text-[14px] animate-pop-in"
           >
             ▶ Продолжить тренировку
           </button>
         )}
 
         {/* Парящий таб-бар: не касается краёв экрана */}
-        <nav className="flex rounded-[24px] bg-card/90 backdrop-blur-md border border-white/10 shadow-brutal">
+        <nav className="flex gap-1 p-1.5 rounded-full bg-[#101011]/95 backdrop-blur-md border border-white/10">
           {TABS.map((t) => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
-              className="flex-1 py-2.5 flex flex-col items-center gap-1 transition-colors"
+              className={`flex-1 py-2 rounded-full flex flex-col items-center gap-0.5 transition-colors ${tab === t.id ? 'bg-[#2a2a2d]' : ''}`}
             >
-              <span className={tab === t.id ? 'text-[#a78bfa]' : 'text-text-disabled'}>
+              <span className={tab === t.id ? 'text-accent' : 'text-text-disabled'}>
                 {t.icon({ width: 22, height: 22 })}
               </span>
-              <span className={`text-[10px] ${tab === t.id ? 'font-bold text-ink' : 'font-semibold text-text-secondary'}`}>
+              <span className={`text-[10px] ${tab === t.id ? 'font-semibold text-ink' : 'font-medium text-text-secondary'}`}>
                 {t.title}
               </span>
-              {tab === t.id && <span className="w-1 h-1 rounded-full bg-accent" />}
             </button>
           ))}
         </nav>
